@@ -97,7 +97,7 @@ def body(reason, offers, state, search, threshold=None, history_path=None):
     if history_path:
         lines.append(stats.bloque(history_path, best["price"], best["currency"]))
         lines.append("")
-    lines.append(msi.bloque(best))
+    lines.append(msi.bloque(best, search))
     lines.append("")
     lines.append(f"Mejor oferta encontrada en: {best['source']}")
     if best.get("link"):

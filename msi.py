@@ -49,7 +49,28 @@ def _clave(airline):
     return None
 
 
-def bloque(best):
+DIRECTO = {
+    "iberia": "https://www.iberia.com/mx/",
+    "aeromexico": "https://www.aeromexico.com/es-mx/booking/round-trip"
+                  "?originCode={o}&destinationCode={d}&departureDate={ida}"
+                  "&returnDate={vuelta}&adults={pax}",
+    "air europa": "https://www.aireuropa.com/mx/es",
+}
+
+
+def liga_directa(airline, search):
+    """Enlace al buscador de la propia aerolínea, que es donde aplican los MSI."""
+    k = _clave(airline)
+    if not k:
+        return None
+    return DIRECTO[k].format(
+        o=search["origin"], d=search["destination"],
+        ida=search["departure_date"], vuelta=search["return_date"],
+        pax=search.get("adults", 1),
+    )
+
+
+def bloque(best, search=None):
     """Texto de MSI para la mejor oferta encontrada."""
     lines = ["MESES SIN INTERESES — BBVA y AMEX", "-" * 60]
     fuente_es_agencia = "kiwi" in (best.get("source", "").lower())
@@ -84,6 +105,12 @@ def bloque(best):
         "📅 El Buen Fin (mediados de noviembre) cae ANTES de tu viaje y es cuando\n"
         "   más MSI se ofrecen: si el precio no baja antes, conviene esperarlo."
     )
+    if search:
+        liga = liga_directa(best.get("airline"), search)
+        if liga:
+            lines.append("")
+            lines.append(f"🔗 Comprar directo con la aerolínea (donde sí aplican los MSI):")
+            lines.append(f"   {liga}")
     lines.append("")
     lines.append(f"Verificado el {VERIFICADO}. Las campañas cambian seguido, confirma aquí:")
     for nombre, url in LIGAS:

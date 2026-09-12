@@ -16,9 +16,17 @@
 ### Hacks que el agente aplica
 - **Barrido por aerolínea:** Google recorta la lista de resultados y esconde tarifas; se le pregunta por cada aerolínea por separado.
 - **Ida y vuelta por separado:** se reporta solo si gana, y advirtiendo que son dos boletos independientes.
+- **Maleta siempre sumada:** si una tarifa no incluye maleta documentada, el agente usa el precio real que cotice el vendedor y, si no lo cotiza, lo estima con la tabla de `equipaje.py` — siempre avisando que **se compra por separado**. Así todas las opciones se comparan con el mismo total.
+- **Comprar directo con la aerolínea:** cada correo trae el enlace al buscador de la aerolínea, porque ahí es donde aplican los MSI de BBVA y Amex.
 - **Precio final, no precio de anzuelo:** una tarifa básica de Booking salía en $31,353 pero sin maleta; sumando los $3,788 de documentar, el total real era $35,141. El agente siempre compara con la maleta ya incluida.
 - **Tendencia propia:** con el historial acumulado en `data/history.jsonl` el agente te dice si el precio de hoy está bajo o alto *para esta ruta*, algo que ninguna fuente externa sabe.
 - **Arbitraje de punto de venta:** solo se reporta si el ahorro pasa del 3%, porque abajo de eso se lo come la comisión por conversión de divisa de tu tarjeta.
+
+### Buscadores que se probaron y no sirven
+Iberia y Aeroméxico bloquean el acceso automático (403 de Akamai / página de
+mantenimiento), igual que Despegar, Trip.com, Kayak y Momondo (captcha o redirección).
+Expedia responde pero con límite de peticiones. Por eso el agente no lee precios
+directo de las aerolíneas: en su lugar te deja el enlace para comprar ahí.
 
 ### Hacks que el agente NO usa, a propósito
 - **Hidden city / throwaway ticketing** (bajarte en la escala): sale barato pero no puedes documentar maleta, la aerolínea puede cancelarte el regreso y hasta cerrarte el programa de viajero frecuente. Con maleta de 23 kg, no aplica.

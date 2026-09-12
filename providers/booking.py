@@ -10,7 +10,9 @@ suelen confundirse:
 A veces gana B, a veces A. Sin el costo de la maleta, comparar es imposible.
 """
 import json
+import os
 import ssl
+import sys
 import urllib.parse
 import urllib.request
 
@@ -20,6 +22,9 @@ try:
     _CTX = ssl.create_default_context(cafile=certifi.where())
 except ImportError:
     _CTX = ssl.create_default_context()
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import equipaje  # noqa: E402
 
 ENDPOINT = "https://flights.booking.com/api/flights/"
 
@@ -118,13 +123,21 @@ def search(search_cfg, provider_cfg=None):
 
         if quiere_maleta and not con_maleta:
             costo = _precio_maleta(o)
-            if costo is None:
-                continue  # sin maleta y sin forma de cotizarla: no sirve
-            precio = tarifa + costo
-            nota = (
-                f"TARIFA BÁSICA {tarifa:,.0f} + MALETA {costo:,.0f} = {precio:,.0f} {currency}. "
-                "La maleta se paga aparte al reservar; confirma el peso permitido."
-            )
+            if costo is not None:
+                precio = tarifa + costo
+                nota = (
+                    f"TARIFA BÁSICA {tarifa:,.0f} + MALETA {costo:,.0f} = "
+                    f"{precio:,.0f} {currency}. La maleta SE COMPRA POR SEPARADO al "
+                    "reservar; confirma el peso permitido."
+                )
+            else:
+                # El vendedor no cotiza la maleta: la estimamos para poder comparar
+                # peras con peras, avisando que es estimación y compra aparte.
+                estimado, explicacion = equipaje.estimar(legs[0]["airline"])
+                if estimado is None:
+                    continue
+                precio = tarifa + estimado
+                nota = f"Tarifa básica {tarifa:,.0f} {currency}. {explicacion}"
         elif con_maleta:
             nota = "Precio total viaje redondo, maleta documentada incluida en la tarifa"
 
