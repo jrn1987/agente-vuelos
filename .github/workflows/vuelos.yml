@@ -14,7 +14,10 @@ on:
         default: false
 
 concurrency:
-  group: agente-vuelos
+  # Los turnos de vigilancia no deben pisarse entre sí, pero un envío de prueba
+  # a mano no tiene por qué esperar 50 minutos a que termine el turno en curso:
+  # por eso va en su propio carril.
+  group: agente-${{ inputs.forzar_correo == true && 'prueba' || 'vigilancia' }}
   cancel-in-progress: false
 
 permissions:
