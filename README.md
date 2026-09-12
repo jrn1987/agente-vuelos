@@ -1,10 +1,7 @@
 # Agente de vuelos directos CDMX → Madrid
 
-Vigila el precio de vuelos **directos** MEX → MAD, ida **22 dic 2026**, regreso
-**2 ene 2027**, **con maleta documentada incluida**, y avisa por correo.
 
-Los destinatarios y la cuenta de envío viven en secrets de GitHub
-(`GMAIL_USER`, `ALERT_TO`, `GMAIL_APP_PASSWORD`), no en el repositorio.
+
 
 ## Fuentes (dos, ambas gratis y sin cuenta)
 
@@ -49,23 +46,6 @@ los precios ya la incluyen. En transatlánticos de estas aerolíneas la franquic
 estándar es de **23 kg** (arriba de los 20 kg pedidos). Verifica siempre en el
 checkout antes de pagar: las tarifas cambian de condiciones sin aviso.
 
-## Correr 24/7 en GitHub Actions (gratis)
-Ver **SETUP-GITHUB.md**. Resumen: subir el repo, guardar la contraseña de
-aplicación como secret `GMAIL_APP_PASSWORD`, y darle *Run workflow*.
-
-## Correr en la Mac
-```bash
-export GMAIL_APP_PASSWORD="tu-contraseña-de-aplicación"
-python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
-.venv/bin/python agent.py --test-mail   # probar correo
-.venv/bin/python agent.py --once        # una búsqueda
-./install.sh                            # dejarlo como servicio cada hora
-```
-Requiere que la Mac esté encendida; por eso GitHub Actions es mejor opción.
-
-## Archivos
-- `agent.py` — lógica principal y decisión de cuándo avisar
-- `providers/googleflights.py` — búsqueda (también hay `amadeus.py` y `serpapi.py` de respaldo)
-- `render.py` / `notifier.py` — armado y envío del correo
+nvío del correo
 - `config.json` — tus parámetros (sin contraseñas)
 - `data/history.jsonl` — historial de precios de cada revisión
