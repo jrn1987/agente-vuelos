@@ -17,7 +17,7 @@
     "notify_on_new_low": true,
     "daily_digest_hour": 9,
     "max_emails_per_day": 20,
-    "max_silence_hours": 24,
+    "max_silence_hours": 8,
     "reference_price": 31563
   },
   "provider": {
@@ -53,6 +53,6 @@
     "to_addrs": "${ALERT_TO}"
   },
   "run": {
-    "interval_minutes": 60
+    "interval_minutes": 10
   }
 }

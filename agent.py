@@ -258,6 +258,14 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--once", action="store_true")
     ap.add_argument("--loop", action="store_true")
+    ap.add_argument(
+        "--loop-minutes",
+        type=int,
+        default=0,
+        help="Revisa en bucle durante N minutos y termina. Pensado para GitHub "
+             "Actions: una sola corrida cubre una hora entera de vigilancia, "
+             "aunque el cron se salte disparos.",
+    )
     ap.add_argument("--test-mail", action="store_true")
     args = ap.parse_args()
     cfg = load_config()
@@ -269,6 +277,26 @@ def main():
             "Si lees esto, el envío de correo funciona correctamente.",
         )
         log("Correo de prueba enviado.")
+        return
+
+    if args.loop_minutes:
+        interval = int(cfg["run"].get("interval_minutes", 10)) * 60
+        fin = time.time() + args.loop_minutes * 60
+        vuelta = 0
+        log(f"Vigilancia continua por {args.loop_minutes} min, revisando cada "
+            f"{interval // 60} min.")
+        while True:
+            vuelta += 1
+            log(f"--- revisión {vuelta} ---")
+            try:
+                run_once(cfg)
+            except Exception:
+                log("ERROR:\n" + traceback.format_exc())
+            # Solo dormimos si alcanza para otra revisión completa.
+            if time.time() + interval >= fin:
+                break
+            time.sleep(interval)
+        log(f"Fin del turno: {vuelta} revisiones.")
         return
 
     if args.loop:

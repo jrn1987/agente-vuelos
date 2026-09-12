@@ -2,9 +2,10 @@ name: Agente de vuelos CDMX → Madrid
 
 on:
   schedule:
-    # GitHub descarta corridas programadas cuando sus servidores están saturados:
-    # pidiendo cada 30 min se cumplen bastantes más que pidiendo cada hora.
-    - cron: "7,37 * * * *"
+    # GitHub descarta la mayoría de los disparos programados, así que en vez de
+    # depender de ellos, CADA corrida vigila durante casi una hora seguida.
+    # Con que se cumpla un disparo de vez en cuando, la cobertura es continua.
+    - cron: "7 * * * *"
   workflow_dispatch:       # botón para correrlo a mano
 
 concurrency:
@@ -17,7 +18,7 @@ permissions:
 jobs:
   buscar:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
 
@@ -33,7 +34,7 @@ jobs:
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
           GMAIL_USER: ${{ secrets.GMAIL_USER }}
           ALERT_TO: ${{ secrets.ALERT_TO }}
-        run: python agent.py --once
+        run: python agent.py --loop-minutes 50
 
       - name: Guardar historial de precios
         if: always()
