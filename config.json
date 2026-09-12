@@ -1,0 +1,56 @@
+{
+  "search": {
+    "origin": "MEX",
+    "destination": "MAD",
+    "departure_date": "2026-12-22",
+    "return_date": "2027-01-02",
+    "adults": 1,
+    "nonstop_only": true,
+    "checked_bag": true,
+    "currency": "MXN",
+    "travel_class": "economy"
+  },
+  "alerts": {
+    "price_threshold": 25000,
+    "drop_pct": 0,
+    "new_low_min_pct": 0,
+    "notify_on_new_low": true,
+    "daily_digest_hour": 9,
+    "max_emails_per_day": 20,
+    "max_silence_hours": 24,
+    "reference_price": 31563
+  },
+  "provider": {
+    "names": [
+      "googleflights",
+      "kiwi",
+      "googleflights_split",
+      "kiwi_intl"
+    ],
+    "googleflights": {
+      "airlines": [
+        "IB",
+        "AM",
+        "UX",
+        "2W"
+      ]
+    },
+    "kiwi": {
+      "limit": 20
+    },
+    "kiwi_intl": {
+      "min_saving_pct": 3
+    }
+  },
+  "email": {
+    "smtp_host": "smtp.gmail.com",
+    "smtp_port": 465,
+    "username": "${GMAIL_USER}",
+    "app_password": "${GMAIL_APP_PASSWORD}",
+    "from_addr": "${GMAIL_USER}",
+    "to_addrs": "${ALERT_TO}"
+  },
+  "run": {
+    "interval_minutes": 60
+  }
+}

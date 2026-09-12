@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.jnavarro.vuelos-mad</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/bin/env</string>
+        <string>python3</string>
+        <string>/Users/jnavarro/agente/agent.py</string>
+        <string>--once</string>
+    </array>
+    <key>StartInterval</key>
+    <integer>3600</integer>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>WorkingDirectory</key>
+    <string>/Users/jnavarro/agente</string>
+    <key>StandardOutPath</key>
+    <string>/Users/jnavarro/agente/logs/launchd.out.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/jnavarro/agente/logs/launchd.err.log</string>
+</dict>
+</plist>

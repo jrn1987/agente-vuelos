@@ -1,0 +1,45 @@
+name: Agente de vuelos CDMX → Madrid
+
+on:
+  schedule:
+    # GitHub descarta corridas programadas cuando sus servidores están saturados:
+    # pidiendo cada 30 min se cumplen bastantes más que pidiendo cada hora.
+    - cron: "7,37 * * * *"
+  workflow_dispatch:       # botón para correrlo a mano
+
+concurrency:
+  group: agente-vuelos
+  cancel-in-progress: false
+
+permissions:
+  contents: write          # para guardar el historial de precios en el repo
+
+jobs:
+  buscar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Buscar vuelos y avisar por correo
+        env:
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          ALERT_TO: ${{ secrets.ALERT_TO }}
+        run: python agent.py --once
+
+      - name: Guardar historial de precios
+        if: always()
+        run: |
+          git config user.name  "agente-vuelos"
+          git config user.email "actions@github.com"
+          git add -f data/state.json data/history.jsonl 2>/dev/null || true
+          git diff --staged --quiet || git commit -m "precios $(date -u '+%Y-%m-%d %H:%M UTC')"
+          git pull --rebase --autostash && git push
