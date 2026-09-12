@@ -1,5 +1,6 @@
 from . import (
     amadeus,
+    booking,
     googleflights,
     googleflights_split,
     kiwi,
@@ -8,6 +9,7 @@ from . import (
 )
 
 PROVIDERS = {
+    "booking": booking.search,
     "googleflights": googleflights.search,
     "googleflights_split": googleflights_split.search,
     "kiwi": kiwi.search,

@@ -23,6 +23,7 @@
   "provider": {
     "names": [
       "googleflights",
+      "booking",
       "kiwi",
       "googleflights_split",
       "kiwi_intl"
@@ -40,7 +41,8 @@
     },
     "kiwi_intl": {
       "min_saving_pct": 3
-    }
+    },
+    "booking": {}
   },
   "email": {
     "smtp_host": "smtp.gmail.com",

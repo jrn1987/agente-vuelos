@@ -232,7 +232,7 @@ def run_once(cfg):
     reason = decide(best["price"], state, cfg["alerts"])
     if reason:
         text, html = render.body(
-            reason, offers, state, search_cfg, cfg["alerts"].get("price_threshold")
+            reason, offers, state, search_cfg, cfg["alerts"].get("price_threshold"), HISTORY
         )
         notifier.send(cfg["email"], render.subject(reason, best, search_cfg), text, html)
         state["emails_sent"] = state.get("emails_sent", 0) + 1

@@ -9,12 +9,15 @@
 |---|---|
 | **Google Flights** | tarifas de las aerolíneas. Búsqueda general **más una por aerolínea** (Iberia, Aeroméxico, Air Europa, World2Fly): la general sola escondía a Iberia, ~$4,300 MXN más barata. |
 | **Kiwi.com** | tarifas de agencias que Google no siempre muestra. |
+| **Booking.com** | además de sus tarifas, es la única que expone el **costo de agregar la maleta**, lo que permite comparar "tarifa básica + maleta" contra "tarifa con maleta incluida". |
 | **2 sencillos** | compra la ida y la vuelta por separado, incluso en aerolíneas distintas. Gana cuando una de las dos fechas está cara. |
 | **Kiwi multi-mercado** | el mismo vuelo comprado desde España, EE.UU. o Reino Unido, convertido a pesos al tipo de cambio del BCE. |
 
 ### Hacks que el agente aplica
 - **Barrido por aerolínea:** Google recorta la lista de resultados y esconde tarifas; se le pregunta por cada aerolínea por separado.
 - **Ida y vuelta por separado:** se reporta solo si gana, y advirtiendo que son dos boletos independientes.
+- **Precio final, no precio de anzuelo:** una tarifa básica de Booking salía en $31,353 pero sin maleta; sumando los $3,788 de documentar, el total real era $35,141. El agente siempre compara con la maleta ya incluida.
+- **Tendencia propia:** con el historial acumulado en `data/history.jsonl` el agente te dice si el precio de hoy está bajo o alto *para esta ruta*, algo que ninguna fuente externa sabe.
 - **Arbitraje de punto de venta:** solo se reporta si el ahorro pasa del 3%, porque abajo de eso se lo come la comisión por conversión de divisa de tu tarjeta.
 
 ### Hacks que el agente NO usa, a propósito

@@ -3,6 +3,7 @@ import datetime as dt
 import re
 
 import msi
+import stats
 
 
 def money(amount, currency):
@@ -51,7 +52,7 @@ HEADLINES = {
 }
 
 
-def body(reason, offers, state, search, threshold=None):
+def body(reason, offers, state, search, threshold=None, history_path=None):
     best = offers[0]
     prev = state.get("last_best_price")
     low = state.get("all_time_low")
@@ -92,6 +93,9 @@ def body(reason, offers, state, search, threshold=None):
             lines.append(f"   ⚠️ {o['note']}")
         if o.get("seats_left"):
             lines.append(f"   Asientos disponibles a este precio: {o['seats_left']}")
+        lines.append("")
+    if history_path:
+        lines.append(stats.bloque(history_path, best["price"], best["currency"]))
         lines.append("")
     lines.append(msi.bloque(best))
     lines.append("")
