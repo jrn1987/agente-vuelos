@@ -34,6 +34,7 @@ def subject(reason, best, search):
         "drop": f"🔻 Bajó de precio: {p} — {search['origin']}→{search['destination']} 22 dic / 2 ene",
         "at_reference": f"➡️ Sigue en {p} — {search['origin']}→{search['destination']} 22 dic / 2 ene",
         "digest": f"📊 Resumen diario {search['origin']}→{search['destination']} — mejor {p}",
+        "prueba": f"🧪 Prueba del agente — {search['origin']}→{search['destination']} en {p}",
         "heartbeat": f"✅ Sigo vigilando — {search['origin']}→{search['destination']} en {p}",
     }
     return tags.get(reason, f"Vuelos {search['origin']}→{search['destination']}: {p}")
@@ -47,6 +48,8 @@ HEADLINES = {
     "at_reference": "El precio sigue en el nivel original o por debajo.",
     "first_run": "Primera búsqueda. Este es el panorama actual; a partir de aquí solo te aviso si mejora.",
     "digest": "Resumen diario.",
+    "prueba": "🧪 Correo de prueba pedido a mano. Todo lo que sigue son datos reales\n"
+              "de esta búsqueda: así se ve un aviso normal del agente.",
     "heartbeat": "Sin novedades: el precio no ha mejorado lo suficiente para avisarte.\n"
                  "Te escribo de todos modos para que sepas que el agente sigue vivo.",
 }

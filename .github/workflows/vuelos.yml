@@ -7,6 +7,11 @@ on:
     # Con que se cumpla un disparo de vez en cuando, la cobertura es continua.
     - cron: "7 * * * *"
   workflow_dispatch:       # botón para correrlo a mano
+    inputs:
+      forzar_correo:
+        description: "Mandar el reporte por correo aunque no haya novedades"
+        type: boolean
+        default: false
 
 concurrency:
   group: agente-vuelos
@@ -34,7 +39,12 @@ jobs:
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
           GMAIL_USER: ${{ secrets.GMAIL_USER }}
           ALERT_TO: ${{ secrets.ALERT_TO }}
-        run: python agent.py --loop-minutes 50
+        run: |
+          if [ "${{ inputs.forzar_correo }}" = "true" ]; then
+            python agent.py --force-email
+          else
+            python agent.py --loop-minutes 50
+          fi
 
       - name: Guardar historial de precios
         if: always()

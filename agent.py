@@ -192,7 +192,7 @@ def gather(cfg):
     return merged, failures
 
 
-def run_once(cfg):
+def run_once(cfg, forzar=False):
     search_cfg = cfg["search"]
     offers, failures = gather(cfg)
 
@@ -230,6 +230,8 @@ def run_once(cfg):
         }) + "\n")
 
     reason = decide(best["price"], state, cfg["alerts"])
+    if forzar:
+        reason = reason or "prueba"
     if reason:
         text, html = render.body(
             reason, offers, state, search_cfg, cfg["alerts"].get("price_threshold"), HISTORY
@@ -267,8 +269,18 @@ def main():
              "aunque el cron se salte disparos.",
     )
     ap.add_argument("--test-mail", action="store_true")
+    ap.add_argument(
+        "--force-email",
+        action="store_true",
+        help="Busca y manda el reporte completo aunque no haya novedades. Para probar.",
+    )
     args = ap.parse_args()
     cfg = load_config()
+
+    if args.force_email:
+        log("Envío forzado (prueba)")
+        run_once(cfg, forzar=True)
+        return
 
     if args.test_mail:
         notifier.send(
