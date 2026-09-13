@@ -54,6 +54,23 @@ jobs:
         run: |
           git config user.name  "agente-vuelos"
           git config user.email "actions@github.com"
-          git add -f data/state.json data/history.jsonl 2>/dev/null || true
-          git diff --staged --quiet || git commit -m "precios $(date -u '+%Y-%m-%d %H:%M UTC')"
-          git pull --rebase --autostash && git push
+          mkdir -p /tmp/mio && cp -f data/* /tmp/mio/ 2>/dev/null || true
+          # Varias corridas pueden guardar a la vez. En vez de un rebase que
+          # choca, se combina con lo que haya en el repo y se reintenta.
+          for intento in 1 2 3 4 5; do
+            git fetch -q origin main
+            git reset -q --hard origin/main
+            python scripts/merge_estado.py data /tmp/mio
+            git add -f data/state.json data/history.jsonl
+            if git diff --staged --quiet; then
+              echo "Sin cambios que guardar"; exit 0
+            fi
+            git commit -q -m "precios $(date -u '+%Y-%m-%d %H:%M UTC')"
+            if git push -q origin main; then
+              echo "Historial guardado en el intento $intento"; exit 0
+            fi
+            echo "Intento $intento: alguien más escribió antes; reintentando"
+            sleep $((RANDOM % 8 + 2))
+          done
+          echo "No se pudo guardar el historial tras 5 intentos" >&2
+          exit 1
