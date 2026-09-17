@@ -4,10 +4,10 @@
   "digest_sent": false,
   "last_best_price": 27896.0,
   "all_time_low": 27896.0,
-  "last_check": "2026-09-17T00:45:17-06:00",
+  "last_check": "2026-09-17T06:16:01-06:00",
   "last_email_ts": "2026-09-17T00:14:28-06:00",
   "prices_notified": [
-    31361.53,
-    27896.0
+    27896.0,
+    31361.53
   ]
 }
