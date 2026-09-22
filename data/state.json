@@ -1,12 +1,10 @@
 {
-  "emails_date": "2026-09-21",
-  "emails_sent": 3,
-  "digest_sent": true,
-  "last_best_price": 32080.0,
+  "emails_date": "2026-09-22",
+  "emails_sent": 0,
+  "digest_sent": false,
+  "last_best_price": 32182.0,
   "all_time_low": 27896.0,
-  "last_check": "2026-09-21T23:26:54-06:00",
+  "last_check": "2026-09-22T04:34:20-06:00",
   "last_email_ts": "2026-09-21T22:45:34-06:00",
-  "prices_notified": [
-    32080.0
-  ]
+  "prices_notified": []
 }
