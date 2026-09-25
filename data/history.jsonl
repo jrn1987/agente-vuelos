@@ -359,3 +359,8 @@
 {"ts": "2026-09-25T08:00:55-06:00", "price": 36116.93, "currency": "MXN", "airline": "Iberia", "source": "Booking.com", "count": 16}
 {"ts": "2026-09-25T08:11:16-06:00", "price": 32641.0, "currency": "MXN", "airline": "Iberia", "source": "Google Flights", "count": 16}
 {"ts": "2026-09-25T08:21:39-06:00", "price": 32641.0, "currency": "MXN", "airline": "Iberia", "source": "Google Flights", "count": 16}
+{"ts": "2026-09-25T12:31:14-06:00", "price": 32641.0, "currency": "MXN", "airline": "Iberia", "source": "Google Flights", "count": 16}
+{"ts": "2026-09-25T12:41:44-06:00", "price": 32641.0, "currency": "MXN", "airline": "Iberia", "source": "Google Flights", "count": 13}
+{"ts": "2026-09-25T12:52:03-06:00", "price": 32641.0, "currency": "MXN", "airline": "Iberia", "source": "Google Flights", "count": 16}
+{"ts": "2026-09-25T13:02:22-06:00", "price": 32641.0, "currency": "MXN", "airline": "Iberia", "source": "Google Flights", "count": 16}
+{"ts": "2026-09-25T13:12:43-06:00", "price": 32641.0, "currency": "MXN", "airline": "Iberia", "source": "Google Flights", "count": 16}
