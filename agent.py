@@ -7,6 +7,7 @@ Uso:
     python3 agent.py --test-mail envía un correo de prueba
 """
 import argparse
+import concurrent.futures
 import datetime as dt
 from zoneinfo import ZoneInfo
 import json
@@ -171,10 +172,23 @@ def gather(cfg):
     """
     search_cfg = cfg["search"]
     names = cfg["provider"].get("names") or [cfg["provider"]["name"]]
+    # Tope de tiempo por fuente: una que se cuelgue no debe retrasar la revisión
+    # completa (Kiwi, por ejemplo, tarda minutos cuando nos limita el ritmo).
+    tope_seg = cfg["provider"].get("timeout_seconds", 120)
     offers, failures = [], []
     for name in names:
         try:
-            got = providers.get(name)(search_cfg, cfg["provider"].get(name, {}))
+            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+                tarea = pool.submit(
+                    providers.get(name), search_cfg, cfg["provider"].get(name, {})
+                )
+                try:
+                    got = tarea.result(timeout=tope_seg)
+                except concurrent.futures.TimeoutError:
+                    failures.append(f"{name} (no respondió en {tope_seg}s)")
+                    log(f"  {name}: SE PASÓ DE TIEMPO ({tope_seg}s), se sigue sin ella")
+                    pool.shutdown(wait=False, cancel_futures=True)
+                    continue
             log(f"  {name}: {len(got)} opciones"
                 + (f" · desde {render.money(got[0]['price'], got[0]['currency'])}" if got else ""))
             offers += got

@@ -45,7 +45,8 @@
     "kiwi_intl": {
       "min_saving_pct": 3
     },
-    "booking": {}
+    "booking": {},
+    "timeout_seconds": 120
   },
   "email": {
     "smtp_host": "smtp.gmail.com",
