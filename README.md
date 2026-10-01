@@ -46,6 +46,19 @@ Las dos se consultan en cada revisión y se combinan quedándose con el precio m
 bajo de cada vuelo. **Si una falla, la otra sigue trabajando**; solo si ninguna
 responde te llega un aviso de error (máximo uno al día).
 
+## Diseño del correo
+`correo.py` arma el correo en HTML con tablas y estilos en línea, porque Gmail y
+Outlook ignoran `<style>` y no soportan flexbox ni grid. Va ordenado por la
+prioridad real de decisión:
+
+1. **Directo con maleta** — un solo boleto, sin conexiones.
+2. **Multi-aerolínea directo** — ida y vuelta directas, compradas por separado.
+3. **Con escala** — ninguna escala pasa de `max_layover_hours`, ni en la ida ni
+   en la vuelta; cada escala se muestra con su duración y su aeropuerto.
+
+Si una categoría no tiene resultados, lo dice en vez de desaparecer. Si el diseño
+fallara, el correo cae a una versión de texto simple en lugar de no enviarse.
+
 ## Niveles de aviso
 
 | Nivel | Cuándo | Asunto |

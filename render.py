@@ -2,6 +2,7 @@
 import datetime as dt
 import re
 
+import correo
 import escalas
 import msi
 import stats
@@ -162,13 +163,16 @@ def body(reason, offers, state, search, threshold=None, history_path=None):
     lines.append(f"Revisado: {dt.datetime.now(dt.timezone.utc).astimezone().strftime('%d/%m/%Y %H:%M')}")
 
     text = "\n".join(lines)
-    html = (
-        "<div style=\"font-family:-apple-system,Segoe UI,sans-serif;max-width:640px\">"
-        f"<h2 style=\"margin:0 0 4px\">{money(best['price'], best['currency'])}"
-        f"<span style=\"font-weight:400;font-size:15px;color:#555\"> · {best['airline']}</span></h2>"
-        f"<p style=\"color:#555;margin:0 0 16px\">{search['origin']} → {search['destination']} · directo · "
-        f"{search['departure_date']} → {search['return_date']}</p>"
-        "<pre style=\"background:#f6f6f6;padding:14px;border-radius:8px;"
-        "white-space:pre-wrap;font-size:13px\">" + text + "</pre></div>"
-    )
+    bloques = []
+    if history_path:
+        bloques.append(("Tendencia", stats.bloque(history_path, best["price"], best["currency"])))
+    bloques.append(("Meses sin intereses — BBVA y Amex", msi.bloque(best, search)))
+    try:
+        html = correo.construir(reason, offers, search, threshold, HEADLINES.get(reason), bloques)
+    except Exception:
+        # Si el diseño falla por algo inesperado, mejor un correo feo que ninguno.
+        html = (
+            "<pre style=\"font-family:ui-monospace,monospace;font-size:13px;"
+            "white-space:pre-wrap\">" + text.replace("&", "&amp;").replace("<", "&lt;") + "</pre>"
+        )
     return text, html

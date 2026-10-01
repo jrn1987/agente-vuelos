@@ -14,14 +14,18 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import escalas  # noqa: E402
 
 
-def _tope(search_cfg):
+def _tope(search_cfg, provider_cfg=None):
+    """provider_cfg["max_stops"]=0 fuerza la variante "multi-aerolínea directo":
+    ida directa con una aerolínea y vuelta directa con otra, en dos boletos."""
+    if provider_cfg and provider_cfg.get("max_stops") is not None:
+        return provider_cfg["max_stops"]
     if search_cfg.get("nonstop_only") is True and search_cfg.get("max_stops") is None:
         return 0
     return search_cfg.get("max_stops", 0)
 
 
-def _cheapest_oneway(search_cfg, date, frm, to):
-    tope = _tope(search_cfg)
+def _cheapest_oneway(search_cfg, date, frm, to, provider_cfg=None):
+    tope = _tope(search_cfg, provider_cfg)
     q = create_query(
         flights=[FlightQuery(date=date, from_airport=frm, to_airport=to, max_stops=tope)],
         trip="one-way",
@@ -79,10 +83,12 @@ def _leg_de(s, f):
 
 def search(search_cfg, provider_cfg=None):
     r_ida = _cheapest_oneway(
-        search_cfg, search_cfg["departure_date"], search_cfg["origin"], search_cfg["destination"]
+        search_cfg, search_cfg["departure_date"], search_cfg["origin"],
+        search_cfg["destination"], provider_cfg,
     )
     r_vuelta = _cheapest_oneway(
-        search_cfg, search_cfg["return_date"], search_cfg["destination"], search_cfg["origin"]
+        search_cfg, search_cfg["return_date"], search_cfg["destination"],
+        search_cfg["origin"], provider_cfg,
     )
     if not r_ida or not r_vuelta:
         return []
@@ -102,7 +108,8 @@ def search(search_cfg, provider_cfg=None):
             "stops": max(len(ida.flights), len(vuelta.flights)) - 1,
             "layovers": paradas_ida + paradas_vuelta,
             "separate_tickets": True,
-            "source": "2 sencillos",
+            "source": "2 sencillos"
+            + (" directos" if _tope(search_cfg, provider_cfg) == 0 else ""),
             "link": "https://www.google.com/travel/flights",
             "note": f"DOS BOLETOS SEPARADOS: ida {ida.price:,.0f} + vuelta {vuelta.price:,.0f}. "
             "Si cancelan un vuelo, el otro boleto no se reacomoda solo.",

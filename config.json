@@ -29,6 +29,7 @@
       "booking",
       "kiwi",
       "googleflights_split",
+      "googleflights_split:directos",
       "kiwi_intl"
     ],
     "googleflights": {
@@ -56,6 +57,9 @@
         "UX",
         "2W"
       ]
+    },
+    "googleflights_split:directos": {
+      "max_stops": 0
     }
   },
   "email": {
