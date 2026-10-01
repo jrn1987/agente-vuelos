@@ -2,6 +2,7 @@
 import datetime as dt
 import re
 
+import escalas
 import msi
 import stats
 
@@ -78,15 +79,41 @@ def body(reason, offers, state, search, threshold=None, history_path=None):
     if low:
         lines.append(f"Mínimo histórico registrado: {money(low, best['currency'])}")
     lines.append("")
-    lines.append(f"Ruta: {search['origin']} → {search['destination']} · Solo vuelos directos")
+    tope = search.get("max_stops", 0)
+    if tope:
+        criterio = (
+            f"Directos y con hasta {tope} escala, "
+            f"siempre que la escala no pase de {search.get('max_layover_hours', 6)} horas"
+        )
+    else:
+        criterio = "Solo vuelos directos"
+    lines.append(f"Ruta: {search['origin']} → {search['destination']} · {criterio}")
     if best.get("checked_bag"):
         lines.append("Incluye 1 maleta documentada de 23 kg (filtro aplicado en la búsqueda)")
     lines.append(f"Ida {search['departure_date']} · Regreso {search['return_date']} · {search.get('adults',1)} adulto(s)")
     lines.append("")
-    lines.append("TOP 5 OPCIONES DIRECTAS (precio = total viaje redondo por persona)")
+    if best.get("separate_tickets"):
+        lines.append("")
+        lines.append("⚠️ LA MÁS BARATA ES DE BOLETOS SEPARADOS")
+        lines.append(
+            "   Son dos contratos distintos: en la escala recoges la maleta, pasas\n"
+            "   migración y vuelves a documentar. Si el primer vuelo se retrasa,\n"
+            "   nadie te reacomoda en el segundo y pierdes ese boleto.\n"
+            "   Compáralo con la mejor opción de un solo boleto antes de decidir."
+        )
+    lines.append("")
+    lines.append("TOP 5 OPCIONES (precio = total viaje redondo por persona)")
     lines.append("-" * 60)
     for i, o in enumerate(offers[:5], 1):
-        lines.append(f"{i}. {money(o['price'], o['currency'])} — {o['airline']}  [{o['source']}]")
+        etiqueta = "directo" if not o.get("stops") else f"{o['stops']} escala(s)"
+        if o.get("separate_tickets"):
+            etiqueta += " · BOLETOS SEPARADOS"
+        lines.append(
+            f"{i}. {money(o['price'], o['currency'])} — {o['airline']}  "
+            f"[{o['source']}]  ({etiqueta})"
+        )
+        for aeropuerto, minutos in o.get("layovers") or []:
+            lines.append(f"   ⏱ escala en {aeropuerto}: {escalas.formato(minutos)}")
         for leg in o["legs"]:
             lines.append(
                 f"   {leg['from']}→{leg['to']}  {_hhmm(leg['depart'])} → {_hhmm(leg['arrive'])}"

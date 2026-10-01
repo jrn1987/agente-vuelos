@@ -5,10 +5,12 @@
     "departure_date": "2026-12-22",
     "return_date": "2027-01-02",
     "adults": 1,
-    "nonstop_only": true,
     "checked_bag": true,
     "currency": "MXN",
-    "travel_class": "economy"
+    "travel_class": "economy",
+    "max_stops": 1,
+    "max_layover_hours": 6,
+    "allow_separate_tickets": true
   },
   "alerts": {
     "price_threshold": 25000,
@@ -37,7 +39,8 @@
       ]
     },
     "kiwi": {
-      "limit": 20
+      "limit": 20,
+      "max_stops": 0
     },
     "kiwi_intl": {
       "min_saving_pct": 3

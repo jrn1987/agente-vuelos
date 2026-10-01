@@ -14,6 +14,11 @@ import fx  # noqa: E402
 
 from . import kiwi  # noqa: E402
 
+# Kiwi se cuelga cuando se le piden escalas, así que el arbitraje se hace solo
+# sobre vuelos directos: su valor está en comparar precios del mismo vuelo entre
+# mercados, no en encontrar itinerarios nuevos.
+SIN_ESCALAS = {"max_stops": 0}
+
 MARKETS = [
     {"market": "es", "locale": "es", "currency": "EUR", "label": "España"},
     {"market": "us", "locale": "en", "currency": "USD", "label": "EE.UU."},
@@ -26,7 +31,7 @@ def search(search_cfg, provider_cfg=None):
     min_saving_pct = provider_cfg.get("min_saving_pct", 3)
 
     try:
-        local = kiwi.search(search_cfg, {"limit": 10})
+        local = kiwi.search(search_cfg, {"limit": 10, **SIN_ESCALAS})
         local_best = min(o["price"] for o in local) if local else None
     except Exception:
         local_best = None
@@ -34,7 +39,7 @@ def search(search_cfg, provider_cfg=None):
     offers = []
     for m in provider_cfg.get("markets", MARKETS):
         try:
-            got = kiwi.search(search_cfg, {"limit": 10, **m})
+            got = kiwi.search(search_cfg, {"limit": 10, **SIN_ESCALAS, **m})
         except Exception:
             continue
         for o in got:

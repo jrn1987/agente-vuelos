@@ -28,9 +28,19 @@ mantenimiento), igual que Despegar, Trip.com, Kayak y Momondo (captcha o redirec
 Expedia responde pero con límite de peticiones. Por eso el agente no lee precios
 directo de las aerolíneas: en su lugar te deja el enlace para comprar ahí.
 
+### Boletos separados
+Están activados (`allow_separate_tickets`), y el agente los marca siempre con
+`BOLETOS SEPARADOS` porque el riesgo es real y concreto:
+
+- En la escala **recoges la maleta y la vuelves a documentar**: no viaja de corrido.
+- Pasas migración del país de la escala, así que puede hacer falta visa de tránsito.
+- Si el primer vuelo se retrasa, **nadie te reacomoda** en el segundo: pierdes ese boleto.
+
+Por eso el correo pone el aviso arriba cuando la opción más barata es de este tipo,
+para que la compares contra la mejor de un solo boleto antes de decidir.
+
 ### Hacks que el agente NO usa, a propósito
 - **Hidden city / throwaway ticketing** (bajarte en la escala): sale barato pero no puedes documentar maleta, la aerolínea puede cancelarte el regreso y hasta cerrarte el programa de viajero frecuente. Con maleta de 23 kg, no aplica.
-- **Conexiones por tu cuenta:** si pierdes el enlace, nadie te reacomoda.
 
 Las dos se consultan en cada revisión y se combinan quedándose con el precio más
 bajo de cada vuelo. **Si una falla, la otra sigue trabajando**; solo si ninguna

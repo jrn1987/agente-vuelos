@@ -25,6 +25,7 @@ except ImportError:
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import equipaje  # noqa: E402
+import escalas  # noqa: E402
 
 ENDPOINT = "https://flights.booking.com/api/flights/"
 
@@ -88,7 +89,12 @@ def search(search_cfg, provider_cfg=None):
         "locale": "es",
         "selected_currency": search_cfg.get("currency", "MXN"),
     }
-    if search_cfg.get("nonstop_only", True):
+    tope = (
+        0
+        if (search_cfg.get("nonstop_only") is True and search_cfg.get("max_stops") is None)
+        else search_cfg.get("max_stops", 0)
+    )
+    if tope == 0:
         params["stops"] = "none"
 
     req = urllib.request.Request(
@@ -110,7 +116,20 @@ def search(search_cfg, provider_cfg=None):
         legs = _legs(o)
         if not legs:
             continue
-        if search_cfg.get("nonstop_only", True) and any(l["stops"] for l in legs):
+        if tope is not None and any(l["stops"] > tope for l in legs):
+            continue
+        paradas = []
+        for seg in o.get("segments", []):
+            tramos = [
+                {
+                    "to": l["arrivalAirport"]["code"],
+                    "arrive": l["arrivalTime"],
+                    "depart": l["departureTime"],
+                }
+                for l in seg.get("legs", [])
+            ]
+            paradas += escalas.de_tramos(tramos)
+        if not escalas.cumple(paradas, search_cfg.get("max_layover_hours")):
             continue
         tarifa = _money(o.get("priceBreakdown", {}).get("total"))
         if tarifa is None:
@@ -149,6 +168,9 @@ def search(search_cfg, provider_cfg=None):
                 "legs": legs,
                 "seats_left": None,
                 "checked_bag": True if (con_maleta or quiere_maleta) else False,
+                "stops": max((l["stops"] for l in legs), default=0),
+                "layovers": paradas,
+                "separate_tickets": False,
                 "source": "Booking.com",
                 "link": link,
                 "note": nota,

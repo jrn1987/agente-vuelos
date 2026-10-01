@@ -185,7 +185,13 @@ def gather(cfg):
     # Un mismo vuelo puede venir de varias fuentes: nos quedamos con el más barato.
     best_by_flight = {}
     for o in offers:
-        key = (o["legs"][0]["depart"], o["airline"])
+        key = (
+            o["legs"][0]["depart"],
+            o["airline"],
+            len(o["legs"]),
+            o["legs"][-1]["arrive"],
+            o.get("separate_tickets", False),
+        )
         if key not in best_by_flight or o["price"] < best_by_flight[key]["price"]:
             best_by_flight[key] = o
     merged = sorted(best_by_flight.values(), key=lambda o: o["price"])

@@ -4,7 +4,13 @@ Hace varias consultas y las combina, porque Google recorta la lista de resultado
 y una sola búsqueda esconde aerolíneas más baratas: se corre una búsqueda general
 más una por aerolínea (Iberia, Aeroméxico, Air Europa, World2Fly).
 """
+import os
+import sys
+
 from fast_flights import FlightQuery, Passengers, create_query, get_flights
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import escalas  # noqa: E402
 
 DEFAULT_AIRLINES = ["IB", "AM", "UX", "2W"]
 # Equipaje documentado incluido en tarifas transatlánticas estándar de estas
@@ -12,20 +18,28 @@ DEFAULT_AIRLINES = ["IB", "AM", "UX", "2W"]
 CHECKED_BAG_KG = 23
 
 
+def _max_stops(search_cfg):
+    """0 = solo directos. 1 = permite una escala. None = sin límite."""
+    if search_cfg.get("nonstop_only") is True and search_cfg.get("max_stops") is None:
+        return 0
+    return search_cfg.get("max_stops", 0)
+
+
 def _query(search_cfg, airline=None):
+    tope = _max_stops(search_cfg)
     legs = [
         FlightQuery(
             date=search_cfg["departure_date"],
             from_airport=search_cfg["origin"],
             to_airport=search_cfg["destination"],
-            max_stops=0 if search_cfg.get("nonstop_only", True) else None,
+            max_stops=tope,
             airlines=[airline] if airline else None,
         ),
         FlightQuery(
             date=search_cfg["return_date"],
             from_airport=search_cfg["destination"],
             to_airport=search_cfg["origin"],
-            max_stops=0 if search_cfg.get("nonstop_only", True) else None,
+            max_stops=tope,
             airlines=[airline] if airline else None,
         ),
     ]
@@ -36,7 +50,7 @@ def _query(search_cfg, airline=None):
         passengers=Passengers(adults=search_cfg.get("adults", 1)),
         currency=search_cfg.get("currency", "MXN"),
         language="es",
-        max_stops=0 if search_cfg.get("nonstop_only", True) else None,
+        max_stops=tope,
         checked_bags=1 if search_cfg.get("checked_bag", True) else 0,
         hide_separate_and_self_transfer=True,
     )
@@ -70,14 +84,26 @@ def search(search_cfg, provider_cfg=None):
             errors.append(f"{airline or 'general'}: {type(exc).__name__}")
             continue
 
+        tope = _max_stops(search_cfg)
         for f in results:
             segs = f.flights
-            if search_cfg.get("nonstop_only", True) and len(segs) > 1:
+            if tope is not None and len(segs) - 1 > tope:
                 continue
             key = (f.price, tuple(f.airlines), _fmt_dt(segs[0].departure))
             if key in seen:
                 continue
             seen.add(key)
+            tramos = [
+                {
+                    "to": s.to_airport.code,
+                    "arrive": _fmt_dt(s.arrival),
+                    "depart": _fmt_dt(s.departure),
+                }
+                for s in segs
+            ]
+            paradas = escalas.de_tramos(tramos)
+            if not escalas.cumple(paradas, search_cfg.get("max_layover_hours")):
+                continue
             offers.append(
                 {
                     "price": float(f.price),
@@ -98,6 +124,9 @@ def search(search_cfg, provider_cfg=None):
                     ],
                     "seats_left": None,
                     "checked_bag": search_cfg.get("checked_bag", True),
+                    "stops": len(segs) - 1,
+                    "layovers": paradas,
+                    "separate_tickets": False,
                     "source": "Google Flights",
                     "link": _link(search_cfg),
                     "note": "Precio total viaje redondo, 1 maleta documentada incluida"
