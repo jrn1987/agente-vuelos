@@ -33,10 +33,18 @@ def bloque(history_path, actual, currency="MXN"):
     minimo, maximo = min(precios), max(precios)
     promedio = sum(precios) / len(precios)
     rango = maximo - minimo
-    pct = 0 if rango == 0 else (actual - minimo) / rango * 100
+    # El precio de ahora puede estar por DEBAJO de todo lo visto: en ese caso el
+    # percentil se sale del rango, así que se acota y se dice explícitamente.
+    nuevo_minimo = actual < minimo
+    pct = 0 if rango == 0 else max(0, min(100, (actual - minimo) / rango * 100))
 
     # Con un rango minúsculo, hablar de "alto" o "bajo" es ruido disfrazado de señal.
-    if rango / promedio * 100 < 2:
+    if nuevo_minimo:
+        veredicto = (
+            f"🟢 Es el precio MÁS BAJO desde que vigilo esta ruta: "
+            f"${minimo - actual:,.0f} {currency} por debajo del mínimo anterior."
+        )
+    elif rango / promedio * 100 < 2:
         veredicto = (
             f"El precio ha estado prácticamente plano: solo ${rango:,.0f} {currency} "
             f"de diferencia entre el mínimo y el máximo ({rango / promedio * 100:.1f}%). "
@@ -73,7 +81,9 @@ def bloque(history_path, actual, currency="MXN"):
     lines.append(f"  Mínimo visto:  ${minimo:,.0f} {currency}")
     lines.append(f"  Promedio:      ${promedio:,.0f} {currency}")
     lines.append(f"  Máximo visto:  ${maximo:,.0f} {currency}")
-    lines.append(f"  Ahora:         ${actual:,.0f} {currency}"
-                 + (f"  (percentil {pct:.0f} del rango)" if rango else ""))
+    lines.append(
+        f"  Ahora:         ${actual:,.0f} {currency}"
+        + ("  (nuevo mínimo)" if nuevo_minimo else (f"  (percentil {pct:.0f} del rango)" if rango else ""))
+    )
     lines.append(f"  Revisiones acumuladas: {len(precios)}")
     return "\n".join(lines)

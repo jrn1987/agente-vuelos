@@ -33,6 +33,7 @@ def subject(reason, best, search):
         "first_run": f"✈️ Agente activo — {search['origin']}→{search['destination']} desde {p}",
         "new_low": f"🔻 NUEVO MÍNIMO {p} — {search['origin']}→{search['destination']} 22 dic / 2 ene",
         "drop": f"🔻 Bajó de precio: {p} — {search['origin']}→{search['destination']} 22 dic / 2 ene",
+        "drop_directo": f"🔻 Bajó el DIRECTO — {search['origin']}→{search['destination']} 22 dic / 2 ene",
         "at_reference": f"➡️ Sigue en {p} — {search['origin']}→{search['destination']} 22 dic / 2 ene",
         "digest": f"📊 Resumen diario {search['origin']}→{search['destination']} — mejor {p}",
         "prueba": f"🧪 Prueba del agente — {search['origin']}→{search['destination']} en {p}",
@@ -47,6 +48,8 @@ HEADLINES = {
     "new_low": "🔻 Nuevo mínimo desde que el agente vigila esta ruta.",
     "drop": "🔻 El precio bajó contra la revisión anterior.",
     "at_reference": "El precio sigue en el nivel original o por debajo.",
+    "drop_directo": "🔻 Bajó el precio del vuelo DIRECTO. Mira la sección de\n"
+                    "la mejor opción directa más abajo.",
     "first_run": "Primera búsqueda. Este es el panorama actual; a partir de aquí solo te aviso si mejora.",
     "digest": "Resumen diario.",
     "prueba": "🧪 Correo de prueba pedido a mano. Todo lo que sigue son datos reales\n"
@@ -92,6 +95,29 @@ def body(reason, offers, state, search, threshold=None, history_path=None):
         lines.append("Incluye 1 maleta documentada de 23 kg (filtro aplicado en la búsqueda)")
     lines.append(f"Ida {search['departure_date']} · Regreso {search['return_date']} · {search.get('adults',1)} adulto(s)")
     lines.append("")
+    directos = [o for o in offers if not o.get("stops")]
+    if directos and directos[0] is not best:
+        d = directos[0]
+        extra = d["price"] - best["price"]
+        lines.append("")
+        lines.append("MEJOR OPCIÓN DIRECTA (sin escalas)")
+        lines.append("-" * 60)
+        lines.append(f"{money(d['price'], d['currency'])} — {d['airline']}  [{d['source']}]")
+        for leg in d["legs"]:
+            lines.append(
+                f"   {leg['from']}→{leg['to']}  {_hhmm(leg['depart'])} → {_hhmm(leg['arrive'])}"
+                f"  {leg['flight']}  {_dur(leg['duration'])}"
+            )
+        lines.append(
+            f"Cuesta {money(extra, d['currency'])} más que la opción más barata, "
+            "que lleva escala."
+        )
+    elif not directos:
+        lines.append("")
+        lines.append("MEJOR OPCIÓN DIRECTA (sin escalas)")
+        lines.append("-" * 60)
+        lines.append("Ninguna fuente devolvió vuelos directos en esta revisión.")
+
     if best.get("separate_tickets"):
         lines.append("")
         lines.append("⚠️ LA MÁS BARATA ES DE BOLETOS SEPARADOS")
@@ -105,7 +131,7 @@ def body(reason, offers, state, search, threshold=None, history_path=None):
     lines.append("TOP 5 OPCIONES (precio = total viaje redondo por persona)")
     lines.append("-" * 60)
     for i, o in enumerate(offers[:5], 1):
-        etiqueta = "directo" if not o.get("stops") else f"{o['stops']} escala(s)"
+        etiqueta = "DIRECTO" if not o.get("stops") else f"{o['stops']} escala(s)"
         if o.get("separate_tickets"):
             etiqueta += " · BOLETOS SEPARADOS"
         lines.append(

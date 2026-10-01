@@ -25,6 +25,7 @@
   "provider": {
     "names": [
       "googleflights",
+      "googleflights:directos",
       "booking",
       "kiwi",
       "googleflights_split",
@@ -46,7 +47,16 @@
       "min_saving_pct": 3
     },
     "booking": {},
-    "timeout_seconds": 120
+    "timeout_seconds": 120,
+    "googleflights:directos": {
+      "max_stops": 0,
+      "airlines": [
+        "IB",
+        "AM",
+        "UX",
+        "2W"
+      ]
+    }
   },
   "email": {
     "smtp_host": "smtp.gmail.com",

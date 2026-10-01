@@ -93,7 +93,7 @@ def save_state(state):
         json.dump(state, f, indent=2)
 
 
-def decide(best_price, state, alerts):
+def decide(best_price, state, alerts, direct_price=None):
     """Devuelve el motivo de la alerta, o None si no hay que enviar correo."""
     today = now().date().isoformat()
     if state.get("emails_date") != today:
@@ -134,6 +134,13 @@ def decide(best_price, state, alerts):
         and best_price not in avisados
     ):
         return "new_low"
+
+    # El directo bajó, aunque el precio general no se haya movido. Importa porque
+    # un directo más barato puede convenir aunque no sea la opción más baja.
+    if direct_price is not None:
+        previo_directo = state.get("last_direct_price")
+        if previo_directo and direct_price < previo_directo:
+            return "drop_directo"
 
     # Sigue en el precio original (o por debajo) y hoy no te lo he dicho.
     ref = alerts.get("reference_price")
@@ -189,7 +196,8 @@ def gather(cfg):
                     log(f"  {name}: SE PASÓ DE TIEMPO ({tope_seg}s), se sigue sin ella")
                     pool.shutdown(wait=False, cancel_futures=True)
                     continue
-            log(f"  {name}: {len(got)} opciones"
+                directos = sum(1 for o in got if not o.get("stops"))
+            log(f"  {name}: {len(got)} opciones ({directos} directas)"
                 + (f" · desde {render.money(got[0]['price'], got[0]['currency'])}" if got else ""))
             offers += got
         except Exception as exc:
@@ -234,8 +242,10 @@ def run_once(cfg, forzar=False):
         return
 
     best = offers[0]
+    directos = [o for o in offers if not o.get("stops")]
+    mejor_directo = directos[0] if directos else None
     state = load_state()
-    log(f"TOTAL {len(offers)} opciones directas · mejor "
+    log(f"TOTAL {len(offers)} opciones · mejor "
         f"{render.money(best['price'], best['currency'])} ({best['airline']}, vía {best['source']})")
 
     os.makedirs(os.path.dirname(HISTORY), exist_ok=True)
@@ -247,9 +257,16 @@ def run_once(cfg, forzar=False):
             "airline": best["airline"],
             "source": best["source"],
             "count": len(offers),
+            "stops": best.get("stops", 0),
+            "direct_price": mejor_directo["price"] if mejor_directo else None,
         }) + "\n")
 
-    reason = decide(best["price"], state, cfg["alerts"])
+    reason = decide(
+        best["price"],
+        state,
+        cfg["alerts"],
+        mejor_directo["price"] if mejor_directo else None,
+    )
     if forzar:
         reason = reason or "prueba"
     if reason:
@@ -271,6 +288,11 @@ def run_once(cfg, forzar=False):
     if best["price"] >= cfg["alerts"].get("price_threshold", 0):
         state.pop("jackpot_price", None)
     state["last_best_price"] = best["price"]
+    if mejor_directo:
+        state["last_direct_price"] = mejor_directo["price"]
+        state["all_time_low_direct"] = min(
+            mejor_directo["price"], state.get("all_time_low_direct", mejor_directo["price"])
+        )
     state["all_time_low"] = min(best["price"], state.get("all_time_low", best["price"]))
     state["last_check"] = now().isoformat(timespec="seconds")
     save_state(state)

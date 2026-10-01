@@ -18,15 +18,22 @@ DEFAULT_AIRLINES = ["IB", "AM", "UX", "2W"]
 CHECKED_BAG_KG = 23
 
 
-def _max_stops(search_cfg):
-    """0 = solo directos. 1 = permite una escala. None = sin límite."""
+def _max_stops(search_cfg, provider_cfg=None):
+    """0 = solo directos. 1 = permite una escala. None = sin límite.
+
+    provider_cfg["max_stops"] permite pedirle a esta fuente un tope distinto al
+    general: así se le piden los directos aparte, sin que los itinerarios con
+    escala los dejen fuera de la lista por ser más caros.
+    """
+    if provider_cfg and provider_cfg.get("max_stops") is not None:
+        return provider_cfg["max_stops"]
     if search_cfg.get("nonstop_only") is True and search_cfg.get("max_stops") is None:
         return 0
     return search_cfg.get("max_stops", 0)
 
 
-def _query(search_cfg, airline=None):
-    tope = _max_stops(search_cfg)
+def _query(search_cfg, airline=None, provider_cfg=None):
+    tope = _max_stops(search_cfg, provider_cfg)
     legs = [
         FlightQuery(
             date=search_cfg["departure_date"],
@@ -79,12 +86,12 @@ def search(search_cfg, provider_cfg=None):
 
     for airline in [None] + list(airlines):
         try:
-            results = get_flights(_query(search_cfg, airline))
+            results = get_flights(_query(search_cfg, airline, provider_cfg))
         except Exception as exc:  # una aerolínea sin vuelos no debe tumbar la corrida
             errors.append(f"{airline or 'general'}: {type(exc).__name__}")
             continue
 
-        tope = _max_stops(search_cfg)
+        tope = _max_stops(search_cfg, provider_cfg)
         for f in results:
             segs = f.flights
             if tope is not None and len(segs) - 1 > tope:
@@ -127,7 +134,8 @@ def search(search_cfg, provider_cfg=None):
                     "stops": len(segs) - 1,
                     "layovers": paradas,
                     "separate_tickets": False,
-                    "source": "Google Flights",
+                    "source": "Google Flights"
+                    + (" · directos" if tope == 0 and search_cfg.get("max_stops") else ""),
                     "link": _link(search_cfg),
                     "note": "Precio total viaje redondo, 1 maleta documentada incluida"
                     if search_cfg.get("checked_bag", True)
