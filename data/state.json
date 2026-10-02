@@ -1,14 +1,15 @@
 {
   "emails_date": "2026-10-02",
-  "emails_sent": 3,
+  "emails_sent": 4,
   "digest_sent": true,
-  "last_best_price": 23656.0,
+  "last_best_price": 25066.0,
   "all_time_low": 22409.39,
-  "last_check": "2026-10-02T10:55:11-06:00",
-  "last_email_ts": "2026-10-02T10:24:35-06:00",
+  "last_check": "2026-10-02T15:58:35-06:00",
+  "last_email_ts": "2026-10-02T15:17:51-06:00",
   "prices_notified": [
     22412.11,
-    23656.0
+    23656.0,
+    25066.0
   ],
   "jackpot_price": 22409.39,
   "last_direct_price": 37938.0,
