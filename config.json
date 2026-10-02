@@ -48,7 +48,9 @@
     "kiwi_intl": {
       "min_saving_pct": 3
     },
-    "booking": {},
+    "booking": {
+      "min_interval_minutes": 60
+    },
     "timeout_seconds": 120,
     "googleflights:directos": {
       "max_stops": 0,
@@ -65,7 +67,8 @@
     "booking_intl": {
       "min_saving_pct": 3,
       "pausa_segundos": 5,
-      "timeout_seconds": 180
+      "timeout_seconds": 180,
+      "min_interval_minutes": 720
     }
   },
   "email": {

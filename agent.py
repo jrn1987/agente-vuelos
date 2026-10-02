@@ -171,6 +171,23 @@ def decide(best_price, state, alerts, direct_price=None):
     return None
 
 
+def en_pausa(name, cfg, state):
+    """Algunas fuentes bloquean si se les pregunta muy seguido (Booking responde
+    429). Las tarifas no cambian cada 10 minutos, así que preguntar menos no
+    pierde nada y evita que nos cierren la puerta."""
+    minimos = (cfg["provider"].get(name) or {}).get("min_interval_minutes")
+    if not minimos:
+        return False
+    ultima = (state.get("provider_last_ok") or {}).get(name)
+    if not ultima:
+        return False
+    try:
+        transcurrido = (now() - dt.datetime.fromisoformat(ultima)).total_seconds() / 60
+    except Exception:
+        return False
+    return transcurrido < minimos
+
+
 def gather(cfg):
     """Consulta todas las fuentes configuradas y junta los resultados.
 
@@ -182,8 +199,14 @@ def gather(cfg):
     # Tope de tiempo por fuente: una que se cuelgue no debe retrasar la revisión
     # completa (Kiwi, por ejemplo, tarda minutos cuando nos limita el ritmo).
     tope_global = cfg["provider"].get("timeout_seconds", 120)
+    estado = load_state()
+    exitos = dict(estado.get("provider_last_ok") or {})
     offers, failures = [], []
     for name in names:
+        if en_pausa(name, cfg, estado):
+            log(f"  {name}: en pausa (se consulta cada "
+                f"{cfg['provider'][name]['min_interval_minutes']} min)")
+            continue
         # booking_intl consulta varios mercados con pausas, así que necesita más
         # margen que una fuente de una sola llamada.
         tope_seg = (cfg["provider"].get(name) or {}).get("timeout_seconds", tope_global)
@@ -203,6 +226,8 @@ def gather(cfg):
             log(f"  {name}: {len(got)} opciones ({directos} directas)"
                 + (f" · desde {render.money(got[0]['price'], got[0]['currency'])}" if got else ""))
             offers += got
+            if got:
+                exitos[name] = now().isoformat(timespec="seconds")
         except Exception as exc:
             failures.append(f"{name} ({type(exc).__name__}: {exc})")
             log(f"  {name}: FALLÓ — {type(exc).__name__}: {exc}")
@@ -220,6 +245,9 @@ def gather(cfg):
         if key not in best_by_flight or o["price"] < best_by_flight[key]["price"]:
             best_by_flight[key] = o
     merged = sorted(best_by_flight.values(), key=lambda o: o["price"])
+    if exitos != (estado.get("provider_last_ok") or {}):
+        estado["provider_last_ok"] = exitos
+        save_state(estado)
     return merged, failures
 
 

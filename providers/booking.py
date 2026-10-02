@@ -38,7 +38,16 @@ def pedir(url, intentos=3, espera=6):
     ultimo = None
     for intento in range(intentos):
         req = urllib.request.Request(
-            url, headers={"user-agent": "Mozilla/5.0", "accept": "application/json"}
+            url,
+            headers={
+                "user-agent": (
+                    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+                    "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0 Safari/537.36"
+                ),
+                "accept": "application/json, text/plain, */*",
+                "accept-language": "es-MX,es;q=0.9,en;q=0.8",
+                "referer": "https://flights.booking.com/",
+            },
         )
         try:
             return json.load(urllib.request.urlopen(req, timeout=60, context=_CTX))
@@ -47,7 +56,13 @@ def pedir(url, intentos=3, espera=6):
             if exc.code != 429:
                 raise
             if intento < intentos - 1:
-                time.sleep(espera * (intento + 1))
+                # Si el servidor dice cuánto esperar, se le obedece.
+                pedido = exc.headers.get("Retry-After") if exc.headers else None
+                try:
+                    pausa = min(60, int(pedido)) if pedido else espera * (intento + 1)
+                except ValueError:
+                    pausa = espera * (intento + 1)
+                time.sleep(pausa)
     raise RuntimeError(f"Booking limitó el ritmo (429) tras {intentos} intentos") from ultimo
 
 
