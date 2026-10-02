@@ -31,8 +31,13 @@ import escalas  # noqa: E402
 ENDPOINT = "https://flights.booking.com/api/flights/"
 
 
-def pedir(url, intentos=3, espera=6):
-    """Booking devuelve 429 si se le pregunta seguido. Se reintenta con pausa."""
+def pedir(url, intentos=1, espera=6):
+    """Pide a Booking una sola vez por defecto.
+
+    Un 429 significa "deja de preguntar": reintentar de inmediato alarga el
+    bloqueo en vez de resolverlo. Quien llama decide esperar (el agente pone la
+    fuente en pausa y la retoma más tarde).
+    """
     import time
 
     ultimo = None
@@ -56,14 +61,16 @@ def pedir(url, intentos=3, espera=6):
             if exc.code != 429:
                 raise
             if intento < intentos - 1:
-                # Si el servidor dice cuánto esperar, se le obedece.
                 pedido = exc.headers.get("Retry-After") if exc.headers else None
                 try:
                     pausa = min(60, int(pedido)) if pedido else espera * (intento + 1)
                 except ValueError:
                     pausa = espera * (intento + 1)
                 time.sleep(pausa)
-    raise RuntimeError(f"Booking limitó el ritmo (429) tras {intentos} intentos") from ultimo
+    raise RuntimeError(
+        "Booking limitó el ritmo (429). Se deja descansar y se retoma en la "
+        "siguiente ventana."
+    ) from ultimo
 
 
 def _money(block):

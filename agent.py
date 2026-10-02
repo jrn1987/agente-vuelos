@@ -175,17 +175,29 @@ def en_pausa(name, cfg, state):
     """Algunas fuentes bloquean si se les pregunta muy seguido (Booking responde
     429). Las tarifas no cambian cada 10 minutos, así que preguntar menos no
     pierde nada y evita que nos cierren la puerta."""
-    minimos = (cfg["provider"].get(name) or {}).get("min_interval_minutes")
-    if not minimos:
-        return False
-    ultima = (state.get("provider_last_ok") or {}).get(name)
-    if not ultima:
-        return False
-    try:
-        transcurrido = (now() - dt.datetime.fromisoformat(ultima)).total_seconds() / 60
-    except Exception:
-        return False
-    return transcurrido < minimos
+    ajustes = cfg["provider"].get(name) or {}
+
+    def minutos_desde(registro):
+        marca = (state.get(registro) or {}).get(name)
+        if not marca:
+            return None
+        try:
+            return (now() - dt.datetime.fromisoformat(marca)).total_seconds() / 60
+        except Exception:
+            return None
+
+    # Tras un rechazo por ritmo, descansar es lo único que ayuda: insistir cada
+    # 10 minutos es lo que mantenía a Booking bloqueándonos.
+    tras_fallo = ajustes.get("cooldown_after_fail_minutes", 60)
+    desde_fallo = minutos_desde("provider_last_fail")
+    if tras_fallo and desde_fallo is not None and desde_fallo < tras_fallo:
+        return f"descansando {tras_fallo - desde_fallo:.0f} min más tras un rechazo"
+
+    minimos = ajustes.get("min_interval_minutes")
+    desde_exito = minutos_desde("provider_last_ok")
+    if minimos and desde_exito is not None and desde_exito < minimos:
+        return f"se consulta cada {minimos} min"
+    return False
 
 
 def gather(cfg):
@@ -201,11 +213,12 @@ def gather(cfg):
     tope_global = cfg["provider"].get("timeout_seconds", 120)
     estado = load_state()
     exitos = dict(estado.get("provider_last_ok") or {})
+    fallos = dict(estado.get("provider_last_fail") or {})
     offers, failures = [], []
     for name in names:
-        if en_pausa(name, cfg, estado):
-            log(f"  {name}: en pausa (se consulta cada "
-                f"{cfg['provider'][name]['min_interval_minutes']} min)")
+        motivo = en_pausa(name, cfg, estado)
+        if motivo:
+            log(f"  {name}: en pausa ({motivo})")
             continue
         # booking_intl consulta varios mercados con pausas, así que necesita más
         # margen que una fuente de una sola llamada.
@@ -219,6 +232,7 @@ def gather(cfg):
                     got = tarea.result(timeout=tope_seg)
                 except concurrent.futures.TimeoutError:
                     failures.append(f"{name} (no respondió en {tope_seg}s)")
+                    fallos[name] = now().isoformat(timespec="seconds")
                     log(f"  {name}: SE PASÓ DE TIEMPO ({tope_seg}s), se sigue sin ella")
                     pool.shutdown(wait=False, cancel_futures=True)
                     continue
@@ -230,6 +244,7 @@ def gather(cfg):
                 exitos[name] = now().isoformat(timespec="seconds")
         except Exception as exc:
             failures.append(f"{name} ({type(exc).__name__}: {exc})")
+            fallos[name] = now().isoformat(timespec="seconds")
             log(f"  {name}: FALLÓ — {type(exc).__name__}: {exc}")
 
     # Un mismo vuelo puede venir de varias fuentes: nos quedamos con el más barato.
@@ -245,8 +260,11 @@ def gather(cfg):
         if key not in best_by_flight or o["price"] < best_by_flight[key]["price"]:
             best_by_flight[key] = o
     merged = sorted(best_by_flight.values(), key=lambda o: o["price"])
-    if exitos != (estado.get("provider_last_ok") or {}):
+    if exitos != (estado.get("provider_last_ok") or {}) or fallos != (
+        estado.get("provider_last_fail") or {}
+    ):
         estado["provider_last_ok"] = exitos
+        estado["provider_last_fail"] = fallos
         save_state(estado)
     return merged, failures
 
