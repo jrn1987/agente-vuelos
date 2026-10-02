@@ -1,6 +1,6 @@
 from . import (
-    amadeus,
     booking,
+    booking_intl,
     googleflights,
     googleflights_split,
     kiwi,
@@ -10,11 +10,11 @@ from . import (
 
 PROVIDERS = {
     "booking": booking.search,
+    "booking_intl": booking_intl.search,
     "googleflights": googleflights.search,
     "googleflights_split": googleflights_split.search,
     "kiwi": kiwi.search,
     "kiwi_intl": kiwi_intl.search,
-    "amadeus": amadeus.search,
     "serpapi": serpapi.search,
 }
 

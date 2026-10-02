@@ -27,6 +27,7 @@
       "googleflights",
       "googleflights:directos",
       "booking",
+      "booking_intl",
       "kiwi",
       "googleflights_split",
       "googleflights_split:directos",
@@ -60,6 +61,11 @@
     },
     "googleflights_split:directos": {
       "max_stops": 0
+    },
+    "booking_intl": {
+      "min_saving_pct": 3,
+      "pausa_segundos": 5,
+      "timeout_seconds": 180
     }
   },
   "email": {

@@ -181,9 +181,12 @@ def gather(cfg):
     names = cfg["provider"].get("names") or [cfg["provider"]["name"]]
     # Tope de tiempo por fuente: una que se cuelgue no debe retrasar la revisión
     # completa (Kiwi, por ejemplo, tarda minutos cuando nos limita el ritmo).
-    tope_seg = cfg["provider"].get("timeout_seconds", 120)
+    tope_global = cfg["provider"].get("timeout_seconds", 120)
     offers, failures = [], []
     for name in names:
+        # booking_intl consulta varios mercados con pausas, así que necesita más
+        # margen que una fuente de una sola llamada.
+        tope_seg = (cfg["provider"].get(name) or {}).get("timeout_seconds", tope_global)
         try:
             with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
                 tarea = pool.submit(

@@ -13,6 +13,7 @@ import json
 import os
 import ssl
 import sys
+import urllib.error
 import urllib.parse
 import urllib.request
 
@@ -28,6 +29,26 @@ import equipaje  # noqa: E402
 import escalas  # noqa: E402
 
 ENDPOINT = "https://flights.booking.com/api/flights/"
+
+
+def pedir(url, intentos=3, espera=6):
+    """Booking devuelve 429 si se le pregunta seguido. Se reintenta con pausa."""
+    import time
+
+    ultimo = None
+    for intento in range(intentos):
+        req = urllib.request.Request(
+            url, headers={"user-agent": "Mozilla/5.0", "accept": "application/json"}
+        )
+        try:
+            return json.load(urllib.request.urlopen(req, timeout=60, context=_CTX))
+        except urllib.error.HTTPError as exc:
+            ultimo = exc
+            if exc.code != 429:
+                raise
+            if intento < intentos - 1:
+                time.sleep(espera * (intento + 1))
+    raise RuntimeError(f"Booking limitó el ritmo (429) tras {intentos} intentos") from ultimo
 
 
 def _money(block):
@@ -86,8 +107,10 @@ def search(search_cfg, provider_cfg=None):
         "depart": search_cfg["departure_date"],
         "return": search_cfg["return_date"],
         "sort": "CHEAPEST",
-        "locale": "es",
-        "selected_currency": search_cfg.get("currency", "MXN"),
+        "selected_currency": (provider_cfg or {}).get(
+            "currency", search_cfg.get("currency", "MXN")
+        ),
+        "locale": (provider_cfg or {}).get("locale", "es"),
     }
     tope = (
         0
@@ -97,11 +120,8 @@ def search(search_cfg, provider_cfg=None):
     if tope == 0:
         params["stops"] = "none"
 
-    req = urllib.request.Request(
-        ENDPOINT + "?" + urllib.parse.urlencode(params),
-        headers={"user-agent": "Mozilla/5.0", "accept": "application/json"},
-    )
-    payload = json.load(urllib.request.urlopen(req, timeout=60, context=_CTX))
+    url_consulta = ENDPOINT + "?" + urllib.parse.urlencode(params)
+    payload = pedir(url_consulta)
 
     quiere_maleta = search_cfg.get("checked_bag", True)
     liga_params = {

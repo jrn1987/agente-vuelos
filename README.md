@@ -3,13 +3,18 @@
 
 
 
-## Fuentes (dos, ambas gratis y sin cuenta)
+## Fuentes (todas gratis y sin cuenta)
+
+> **Amadeus ya no está.** Cerró su API gratuita Self-Service el 17 de julio de 2026:
+> `test.api.amadeus.com` no resuelve y producción responde 410. Su proveedor se
+> eliminó del repo para no dejar código muerto.
 
 | Fuente | Qué aporta |
 |---|---|
 | **Google Flights** | tarifas de las aerolíneas. Búsqueda general **más una por aerolínea** (Iberia, Aeroméxico, Air Europa, World2Fly): la general sola escondía a Iberia, ~$4,300 MXN más barata. |
 | **Kiwi.com** | tarifas de agencias que Google no siempre muestra. |
 | **Booking.com** | además de sus tarifas, es la única que expone el **costo de agregar la maleta**, lo que permite comparar "tarifa básica + maleta" contra "tarifa con maleta incluida". |
+| **Booking multi-mercado** | el mismo vuelo comprado desde España, EE.UU. o Reino Unido, convertido a pesos al tipo de cambio del BCE. Solo se reporta si el ahorro pasa del 3%. |
 | **2 sencillos** | compra la ida y la vuelta por separado, incluso en aerolíneas distintas. Gana cuando una de las dos fechas está cara. |
 | **Kiwi multi-mercado** | el mismo vuelo comprado desde España, EE.UU. o Reino Unido, convertido a pesos al tipo de cambio del BCE. |
 
@@ -42,7 +47,7 @@ para que la compares contra la mejor de un solo boleto antes de decidir.
 ### Hacks que el agente NO usa, a propósito
 - **Hidden city / throwaway ticketing** (bajarte en la escala): sale barato pero no puedes documentar maleta, la aerolínea puede cancelarte el regreso y hasta cerrarte el programa de viajero frecuente. Con maleta de 23 kg, no aplica.
 
-Las dos se consultan en cada revisión y se combinan quedándose con el precio más
+Todas se consultan en cada revisión y se combinan quedándose con el precio más
 bajo de cada vuelo. **Si una falla, la otra sigue trabajando**; solo si ninguna
 responde te llega un aviso de error (máximo uno al día).
 
