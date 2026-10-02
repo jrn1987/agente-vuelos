@@ -1,11 +1,11 @@
 {
   "emails_date": "2026-10-02",
-  "emails_sent": 6,
+  "emails_sent": 7,
   "digest_sent": true,
   "last_best_price": 25066.0,
   "all_time_low": 22409.39,
-  "last_check": "2026-10-02T16:54:59-06:00",
-  "last_email_ts": "2026-10-02T16:54:59-06:00",
+  "last_check": "2026-10-02T17:12:16-06:00",
+  "last_email_ts": "2026-10-02T17:12:16-06:00",
   "prices_notified": [
     22412.11,
     23656.0,
@@ -13,5 +13,12 @@
   ],
   "jackpot_price": 22409.39,
   "last_direct_price": 37938.0,
-  "all_time_low_direct": 37938.0
+  "all_time_low_direct": 37938.0,
+  "provider_last_ok": {
+    "googleflights": "2026-10-02T17:10:17-06:00",
+    "googleflights:directos": "2026-10-02T17:10:19-06:00",
+    "kiwi": "2026-10-02T17:12:08-06:00",
+    "googleflights_split": "2026-10-02T17:12:09-06:00",
+    "googleflights_split:directos": "2026-10-02T17:12:10-06:00"
+  }
 }
