@@ -517,3 +517,8 @@
 {"ts": "2026-10-01T20:33:42-06:00", "price": 22413.39, "currency": "MXN", "airline": "Avianca", "source": "Booking.com", "count": 34, "stops": 1, "direct_price": 37942.0}
 {"ts": "2026-10-01T20:44:05-06:00", "price": 22413.39, "currency": "MXN", "airline": "Avianca", "source": "Booking.com", "count": 34, "stops": 1, "direct_price": 37942.0}
 {"ts": "2026-10-01T20:54:27-06:00", "price": 22413.39, "currency": "MXN", "airline": "Avianca", "source": "Booking.com", "count": 28, "stops": 1, "direct_price": 37942.0}
+{"ts": "2026-10-02T03:39:47-06:00", "price": 22412.11, "currency": "MXN", "airline": "Avianca", "source": "Booking.com", "count": 28, "stops": 1, "direct_price": 37938.0}
+{"ts": "2026-10-02T03:50:14-06:00", "price": 22412.11, "currency": "MXN", "airline": "Avianca", "source": "Booking.com", "count": 35, "stops": 1, "direct_price": 37938.0}
+{"ts": "2026-10-02T04:00:37-06:00", "price": 22412.11, "currency": "MXN", "airline": "Avianca", "source": "Booking.com", "count": 35, "stops": 1, "direct_price": 37938.0}
+{"ts": "2026-10-02T04:11:02-06:00", "price": 22412.11, "currency": "MXN", "airline": "Avianca", "source": "Booking.com", "count": 35, "stops": 1, "direct_price": 37938.0}
+{"ts": "2026-10-02T04:21:29-06:00", "price": 22412.11, "currency": "MXN", "airline": "Avianca", "source": "Booking.com", "count": 35, "stops": 1, "direct_price": 37938.0}
