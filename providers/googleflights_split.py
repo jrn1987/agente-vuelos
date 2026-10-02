@@ -14,6 +14,16 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import escalas  # noqa: E402
 
 
+def _liga_tramo(s, fecha, frm, to, airline=None):
+    """Son dos compras separadas, así que cada tramo lleva su propio enlace."""
+    import urllib.parse
+
+    q = f"Flights from {frm} to {to} on {fecha} one way"
+    if airline:
+        q += f" with {airline}"
+    return "https://www.google.com/travel/flights?q=" + urllib.parse.quote(q)
+
+
 def _tope(search_cfg, provider_cfg=None):
     """provider_cfg["max_stops"]=0 fuerza la variante "multi-aerolínea directo":
     ida directa con una aerolínea y vuelta directa con otra, en dos boletos."""
@@ -110,7 +120,17 @@ def search(search_cfg, provider_cfg=None):
             "separate_tickets": True,
             "source": "2 sencillos"
             + (" directos" if _tope(search_cfg, provider_cfg) == 0 else ""),
-            "link": "https://www.google.com/travel/flights",
+            "link": _liga_tramo(search_cfg, search_cfg["departure_date"],
+                                search_cfg["origin"], search_cfg["destination"],
+                                ida.airlines[0] if ida.airlines else None),
+            "links": [
+                ("Comprar IDA", _liga_tramo(
+                    search_cfg, search_cfg["departure_date"], search_cfg["origin"],
+                    search_cfg["destination"], ida.airlines[0] if ida.airlines else None)),
+                ("Comprar VUELTA", _liga_tramo(
+                    search_cfg, search_cfg["return_date"], search_cfg["destination"],
+                    search_cfg["origin"], vuelta.airlines[0] if vuelta.airlines else None)),
+            ],
             "note": f"DOS BOLETOS SEPARADOS: ida {ida.price:,.0f} + vuelta {vuelta.price:,.0f}. "
             "Si cancelan un vuelo, el otro boleto no se reacomoda solo.",
             "split": True,

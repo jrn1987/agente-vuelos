@@ -104,11 +104,22 @@ def search(search_cfg, provider_cfg=None):
     payload = json.load(urllib.request.urlopen(req, timeout=60, context=_CTX))
 
     quiere_maleta = search_cfg.get("checked_bag", True)
+    liga_params = {
+        "type": "ROUNDTRIP",
+        "adults": search_cfg.get("adults", 1),
+        "cabinClass": (search_cfg.get("travel_class") or "economy").upper(),
+        "from": f"{search_cfg['origin']}.AIRPORT",
+        "to": f"{search_cfg['destination']}.AIRPORT",
+        "depart": search_cfg["departure_date"],
+        "return": search_cfg["return_date"],
+        "sort": "CHEAPEST",
+        "selected_currency": search_cfg.get("currency", "MXN"),
+    }
+    if tope == 0:
+        liga_params["stops"] = "none"
     link = (
-        "https://flights.booking.com/flights/"
-        f"{search_cfg['origin']}.AIRPORT-{search_cfg['destination']}.AIRPORT/"
-        f"?type=ROUNDTRIP&depart={search_cfg['departure_date']}"
-        f"&return={search_cfg['return_date']}&stops=none"
+        f"https://flights.booking.com/flights/{search_cfg['origin']}.AIRPORT-"
+        f"{search_cfg['destination']}.AIRPORT/?" + urllib.parse.urlencode(liga_params)
     )
 
     offers = []
@@ -173,6 +184,7 @@ def search(search_cfg, provider_cfg=None):
                 "separate_tickets": False,
                 "source": "Booking.com",
                 "link": link,
+                "links": [("Ver en Booking.com", link)],
                 "note": nota,
                 "bag_included_in_fare": con_maleta,
             }

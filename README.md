@@ -51,6 +51,11 @@ responde te llega un aviso de error (máximo uno al día).
 Outlook ignoran `<style>` y no soportan flexbox ni grid. Va ordenado por la
 prioridad real de decisión:
 
+El **directo con maleta encabeza el correo**: su precio va en la cabecera, y si
+otra opción es más barata se menciona ahí con un puntero a su sección, en vez de
+desplazarlo. Cada opción trae su **botón directo a la oferta**; los itinerarios
+de dos boletos llevan un enlace por tramo, porque son dos compras distintas.
+
 1. **Directo con maleta** — un solo boleto, sin conexiones.
 2. **Multi-aerolínea directo** — ida y vuelta directas, compradas por separado.
 3. **Con escala** — ninguna escala pasa de `max_layover_hours`, ni en la ida ni

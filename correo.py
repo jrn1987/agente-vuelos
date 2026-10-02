@@ -110,6 +110,21 @@ def _tramos_html(legs, horas_max):
     return "".join(filas)
 
 
+def _botones(offer):
+    ligas = offer.get("links") or (
+        [("Ver esta oferta", offer["link"])] if offer.get("link") else []
+    )
+    if not ligas:
+        return ""
+    botones = "".join(
+        f'<a href="{_esc(url)}" style="display:inline-block;margin:0 8px 6px 0;'
+        f'padding:9px 16px;background:{AZUL};color:#ffffff;text-decoration:none;'
+        f'border-radius:6px;font-size:13px;font-weight:600">{_esc(txt)} &rarr;</a>'
+        for txt, url in ligas
+    )
+    return f'<div style="margin-top:12px">{botones}</div>'
+
+
 def tarjeta(offer, destino, horas_max, etiqueta=None, destacada=False):
     ida, vuelta = partir(offer, destino)
     borde = AZUL if destacada else BORDE
@@ -166,7 +181,7 @@ def tarjeta(offer, destino, horas_max, etiqueta=None, destacada=False):
         f'{_esc(offer.get("airline", ""))}</td></tr></table>'
         f'<div style="margin:8px 0 2px">{"".join(chips)}</div>'
         f'<table width="100%" cellpadding="0" cellspacing="0" role="presentation">'
-        f"{secciones}</table>{aviso}</td></tr></table>"
+        f"{secciones}</table>{aviso}{_botones(offer)}</td></tr></table>"
     )
 
 
@@ -192,6 +207,10 @@ def construir(reason, offers, search, threshold, encabezado, bloques_texto):
     horas = search.get("max_layover_hours")
     directos, multi, con_escala = clasificar(offers)
     best = min(offers, key=lambda o: o["price"])
+    # El protagonista del correo es el directo con maleta; el resto va después.
+    principal = next((o for o in directos if o.get("checked_bag")), None) or (
+        directos[0] if directos else best
+    )
 
     titulares = {
         "jackpot": ("🚨 Vale la pena: está debajo de tu objetivo", ROJO),
@@ -208,7 +227,7 @@ def construir(reason, offers, search, threshold, encabezado, bloques_texto):
 
     diff = ""
     if threshold:
-        delta = best["price"] - threshold
+        delta = principal["price"] - threshold
         diff = (
             f"{money(abs(delta), best['currency'])} debajo de tu objetivo"
             if delta < 0
@@ -225,12 +244,30 @@ def construir(reason, offers, search, threshold, encabezado, bloques_texto):
         f'<div style="font-size:11px;letter-spacing:1px;color:#c7d7ee;font-weight:700">'
         f'{_esc(search["origin"])} → {_esc(search["destination"])} · '
         f'{_esc(search["departure_date"])} al {_esc(search["return_date"])}</div>'
-        f'<div style="font-size:30px;font-weight:700;color:#ffffff;margin-top:6px;'
-        f'line-height:34px">{money(best["price"], best["currency"])}</div>'
-        f'<div style="font-size:13px;color:#dbe6f5;margin-top:4px">{_esc(titulo)}</div>'
+        f'<div style="font-size:11px;color:#9fbce4;margin-top:10px;font-weight:700;'
+        f'letter-spacing:.6px">DIRECTO CON MALETA</div>'
+        f'<div style="font-size:30px;font-weight:700;color:#ffffff;margin-top:2px;'
+        f'line-height:34px">{money(principal["price"], principal["currency"])}'
+        f'<span style="font-size:14px;font-weight:400;color:#dbe6f5"> · '
+        f'{_esc(principal.get("airline", ""))}</span></div>'
+        f'<div style="font-size:13px;color:#dbe6f5;margin-top:6px">{_esc(titulo)}</div>'
         + (
             f'<div style="font-size:12px;color:#c7d7ee;margin-top:6px">{_esc(diff)}</div>'
             if diff
+            else ""
+        )
+        + (
+            f'<div style="margin-top:12px;padding-top:10px;border-top:1px solid #3d6aa8;'
+            f'font-size:12px;color:#dbe6f5">La más barata de todas es '
+            f'<strong style="color:#ffffff">{money(best["price"], best["currency"])}</strong> '
+            f'con {_esc(best.get("airline", ""))}, '
+            + (
+                f'con {best["stops"]} escala.'
+                if best.get("stops")
+                else "directa."
+            )
+            + " Está abajo, en su sección.</div>"
+            if best is not principal
             else ""
         )
         + "</td></tr>",

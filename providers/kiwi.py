@@ -50,6 +50,13 @@ query Q($search: SearchReturnInput, $filter: ItinerariesFilterInput, $options: I
 }"""
 
 
+def _liga(s):
+    return (
+        "https://www.kiwi.com/es/search/results/"
+        f"{s['origin']}/{s['destination']}/{s['departure_date']}/{s['return_date']}"
+    )
+
+
 def _segments(sector):
     return [s["segment"] for s in (sector or {}).get("sectorSegments", [])]
 
@@ -203,9 +210,8 @@ def search(search_cfg, provider_cfg=None):
                     if separados
                     else (" (boleto sin confirmar)" if separados is None else "")
                 ),
-                "link": f"https://www.kiwi.com/es/search/results/"
-                f"{search_cfg['origin']}/{search_cfg['destination']}/"
-                f"{search_cfg['departure_date']}/{search_cfg['return_date']}",
+                "link": _liga(search_cfg),
+                "links": [("Ver en Kiwi.com", _liga(search_cfg))],
                 "note": "Precio total viaje redondo"
                 + (", 1 maleta documentada incluida" if search_cfg.get("checked_bag", True) else "")
                 + (

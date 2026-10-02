@@ -69,13 +69,18 @@ def _fmt_dt(sd):
     return f"{y:04d}-{m:02d}-{d:02d}T{hh:02d}:{mm:02d}:00"
 
 
-def _link(s):
+def _link(s, airline=None, directo=True):
+    """Enlace a Google Flights con la ruta, fechas y aerolínea ya puestas."""
     import urllib.parse
 
     q = (
-        f"vuelos de {s['origin']} a {s['destination']} el {s['departure_date']} "
-        f"regresando el {s['return_date']} sin escalas"
+        f"Flights from {s['origin']} to {s['destination']} on {s['departure_date']} "
+        f"returning {s['return_date']}"
     )
+    if airline:
+        q += f" with {airline}"
+    if directo:
+        q += " nonstop"
     return "https://www.google.com/travel/flights?q=" + urllib.parse.quote(q)
 
 
@@ -136,7 +141,17 @@ def search(search_cfg, provider_cfg=None):
                     "separate_tickets": False,
                     "source": "Google Flights"
                     + (" · directos" if tope == 0 and search_cfg.get("max_stops") else ""),
-                    "link": _link(search_cfg),
+                    "link": _link(search_cfg, f.airlines[0] if f.airlines else None, len(segs) == 1),
+                    "links": [
+                        (
+                            "Ver en Google Flights",
+                            _link(
+                                search_cfg,
+                                f.airlines[0] if f.airlines else None,
+                                len(segs) == 1,
+                            ),
+                        )
+                    ],
                     "note": "Precio total viaje redondo, 1 maleta documentada incluida"
                     if search_cfg.get("checked_bag", True)
                     else "Precio total viaje redondo",
