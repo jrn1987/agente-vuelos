@@ -87,3 +87,18 @@ def bloque(history_path, actual, currency="MXN"):
     )
     lines.append(f"  Revisiones acumuladas: {len(precios)}")
     return "\n".join(lines)
+
+
+def por_dia(history_path, dias=10):
+    """Precio mínimo de cada día, para dibujar la tendencia en el correo."""
+    datos = _leer(history_path, dias=30)
+    por = {}
+    for d in datos:
+        if not d.get("price"):
+            continue
+        dia = str(d.get("ts", ""))[:10]
+        if not dia:
+            continue
+        por[dia] = min(por.get(dia, d["price"]), d["price"])
+    ordenados = sorted(por.items())[-dias:]
+    return ordenados

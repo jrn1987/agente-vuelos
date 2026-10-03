@@ -20,6 +20,7 @@ BASE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, BASE)
 
 import notifier  # noqa: E402
+import plan_b as plan_b_mod  # noqa: E402
 import providers  # noqa: E402
 import render  # noqa: E402
 
@@ -318,9 +319,26 @@ def run_once(cfg, forzar=False):
     )
     if forzar:
         reason = reason or "prueba"
+    alternativos = None
+    if reason and (cfg.get("plan_b") or {}).get("enabled"):
+        # 5 consultas extra por correo, no por revisión: si no hay nada que
+        # contar, no se cotizan destinos alternativos.
+        try:
+            alternativos = plan_b_mod.buscar(search_cfg, cfg["plan_b"])
+            log(f"  plan B: {sum(1 for r in alternativos if r['offer'])} de "
+                f"{len(alternativos)} destinos cotizados")
+        except Exception as exc:
+            log(f"  plan B: FALLÓ — {type(exc).__name__}: {exc}")
+
     if reason:
         text, html = render.body(
-            reason, offers, state, search_cfg, cfg["alerts"].get("price_threshold"), HISTORY
+            reason,
+            offers,
+            state,
+            search_cfg,
+            cfg["alerts"].get("price_threshold"),
+            HISTORY,
+            alternativos,
         )
         notifier.send(cfg["email"], render.subject(reason, best, search_cfg), text, html)
         state["emails_sent"] = state.get("emails_sent", 0) + 1

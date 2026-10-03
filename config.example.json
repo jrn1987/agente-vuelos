@@ -98,5 +98,30 @@
   },
   "run": {
     "interval_minutes": 10
+  },
+  "plan_b": {
+    "enabled": true,
+    "destinations": [
+      {
+        "code": "LAX",
+        "name": "Los Ángeles"
+      },
+      {
+        "code": "JFK",
+        "name": "Nueva York"
+      },
+      {
+        "code": "ORD",
+        "name": "Chicago"
+      },
+      {
+        "code": "CDG",
+        "name": "París"
+      },
+      {
+        "code": "NRT",
+        "name": "Tokio"
+      }
+    ]
   }
 }

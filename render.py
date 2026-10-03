@@ -60,7 +60,7 @@ HEADLINES = {
 }
 
 
-def body(reason, offers, state, search, threshold=None, history_path=None):
+def body(reason, offers, state, search, threshold=None, history_path=None, plan_b=None):
     best = offers[0]
     prev = state.get("last_best_price")
     low = state.get("all_time_low")
@@ -160,6 +160,20 @@ def body(reason, offers, state, search, threshold=None, history_path=None):
     if best.get("link"):
         lines.append(f"Ver / reservar: {best['link']}")
     lines.append("")
+    if plan_b:
+        lines.append("")
+        lines.append("PLAN B — OTROS DESTINOS DIRECTOS, MISMAS FECHAS")
+        lines.append("-" * 60)
+        for alt in plan_b:
+            o = alt.get("offer")
+            if o:
+                lines.append(
+                    f"  {alt['name']:<14} {money(o['price'], o['currency']):>16}  "
+                    f"{o['airline']}"
+                )
+            else:
+                lines.append(f"  {alt['name']:<14} {'sin vuelos directos':>16}")
+        lines.append("")
     lines.append(f"Revisado: {dt.datetime.now(dt.timezone.utc).astimezone().strftime('%d/%m/%Y %H:%M')}")
 
     text = "\n".join(lines)
@@ -167,8 +181,18 @@ def body(reason, offers, state, search, threshold=None, history_path=None):
     if history_path:
         bloques.append(("Tendencia", stats.bloque(history_path, best["price"], best["currency"])))
     bloques.append(("Meses sin intereses — BBVA y Amex", msi.bloque(best, search)))
+    serie = stats.por_dia(history_path) if history_path else []
     try:
-        html = correo.construir(reason, offers, search, threshold, HEADLINES.get(reason), bloques)
+        html = correo.construir(
+            reason,
+            offers,
+            search,
+            threshold,
+            HEADLINES.get(reason),
+            bloques,
+            plan_b=plan_b,
+            serie=serie,
+        )
     except Exception:
         # Si el diseño falla por algo inesperado, mejor un correo feo que ninguno.
         html = (

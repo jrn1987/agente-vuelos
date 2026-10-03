@@ -187,6 +187,162 @@ def tarjeta(offer, destino, horas_max, etiqueta=None, destacada=False):
     )
 
 
+def _kpi(etiqueta, valor, pie, color=TINTA):
+    return (
+        f'<td width="33%" style="padding:12px 10px;background:#ffffff;'
+        f'border:1px solid {BORDE};border-radius:10px;vertical-align:top">'
+        f'<div style="font-size:10px;letter-spacing:.7px;color:{GRIS};font-weight:700">'
+        f"{_esc(etiqueta)}</div>"
+        f'<div style="font-size:19px;font-weight:700;color:{color};margin-top:4px;'
+        f'line-height:23px">{_esc(valor)}</div>'
+        f'<div style="font-size:11px;color:{GRIS};margin-top:3px;line-height:15px">'
+        f"{_esc(pie)}</div></td>"
+    )
+
+
+def _kpis(principal, best, threshold):
+    celdas = [
+        _kpi(
+            "DIRECTO CON MALETA",
+            money(principal["price"], principal["currency"]),
+            principal.get("airline", ""),
+        ),
+        _kpi(
+            "LA MÁS BARATA",
+            money(best["price"], best["currency"]),
+            (f"{best['stops']} escala · " if best.get("stops") else "directa · ")
+            + (best.get("airline", "") or ""),
+            VERDE if best is not principal else TINTA,
+        ),
+    ]
+    if threshold:
+        delta = best["price"] - threshold
+        celdas.append(
+            _kpi(
+                "TU OBJETIVO",
+                money(threshold, best["currency"]),
+                f"{money(abs(delta), best['currency'])} "
+                + ("por debajo ✅" if delta < 0 else "por encima"),
+                VERDE if delta < 0 else AMBAR,
+            )
+        )
+    separador = '<td width="8" style="font-size:0;line-height:0">&nbsp;</td>'
+    return (
+        f'<tr><td style="padding:12px 0 0"><table width="100%" cellpadding="0" '
+        f'cellspacing="0" role="presentation"><tr>'
+        + separador.join(celdas)
+        + "</tr></table></td></tr>"
+    )
+
+
+def _barra(ancho_pct, color):
+    return (
+        f'<table width="100%" cellpadding="0" cellspacing="0" role="presentation">'
+        f'<tr><td style="background:{BORDE};border-radius:4px;font-size:0;line-height:0">'
+        f'<table width="{max(2, min(100, ancho_pct)):.0f}%" cellpadding="0" '
+        f'cellspacing="0" role="presentation"><tr>'
+        f'<td style="background:{color};height:8px;border-radius:4px;font-size:0;'
+        f'line-height:0">&nbsp;</td></tr></table></td></tr></table>'
+    )
+
+
+def plan_b_tabla(resultados, madrid_precio, currency="MXN"):
+    """Comparativa de destinos alternativos, con barra proporcional al precio."""
+    con_precio = [r for r in resultados if r.get("offer")]
+    if not con_precio:
+        return _vacio("No pude cotizar los destinos alternativos en esta revisión.")
+    tope = max([r["offer"]["price"] for r in con_precio] + [madrid_precio or 0])
+
+    filas = []
+    for r in resultados:
+        o = r.get("offer")
+        if not o:
+            filas.append(
+                f'<tr><td style="padding:9px 0;font-size:13px;color:{GRIS}">'
+                f'{_esc(r["name"])} <span style="font-size:11px">({_esc(r["code"])})</span></td>'
+                f'<td colspan="2" style="padding:9px 0;font-size:12px;color:{GRIS}">'
+                f'sin vuelos directos</td></tr>'
+            )
+            continue
+        barato = madrid_precio and o["price"] < madrid_precio
+        color = VERDE if barato else AZUL
+        liga = (o.get("links") or [(None, o.get("link"))])[0][1]
+        filas.append(
+            f'<tr><td style="padding:9px 8px 9px 0;vertical-align:top">'
+            f'<div style="font-size:13px;font-weight:600;color:{TINTA}">'
+            f'{_esc(r["name"])}</div>'
+            f'<div style="font-size:11px;color:{GRIS}">{_esc(o.get("airline",""))} · '
+            f'{_esc(_dur(o["legs"][0].get("duration")))}</div></td>'
+            f'<td style="padding:9px 8px;vertical-align:middle;width:45%">'
+            f'{_barra(o["price"] / tope * 100 if tope else 0, color)}</td>'
+            f'<td style="padding:9px 0;text-align:right;vertical-align:top;white-space:nowrap">'
+            f'<div style="font-size:14px;font-weight:700;color:{color}">'
+            f'{money(o["price"], o["currency"])}</div>'
+            + (
+                f'<a href="{_esc(liga)}" style="font-size:11px;color:{AZUL};'
+                f'text-decoration:underline">ver vuelo</a>'
+                if liga
+                else ""
+            )
+            + "</td></tr>"
+        )
+
+    encabezado_madrid = ""
+    if madrid_precio:
+        encabezado_madrid = (
+            f'<tr><td style="padding:9px 8px 9px 0;vertical-align:top">'
+            f'<div style="font-size:13px;font-weight:700;color:{TINTA}">Madrid '
+            f'<span style="font-size:11px;font-weight:400;color:{GRIS}">'
+            f'(tu destino)</span></div></td>'
+            f'<td style="padding:9px 8px;vertical-align:middle">'
+            f'{_barra(100, TINTA)}</td>'
+            f'<td style="padding:9px 0;text-align:right;white-space:nowrap">'
+            f'<div style="font-size:14px;font-weight:700;color:{TINTA}">'
+            f'{money(madrid_precio, currency)}</div></td></tr>'
+        )
+
+    return (
+        f'<table width="100%" cellpadding="0" cellspacing="0" role="presentation" '
+        f'style="background:#ffffff;border:1px solid {BORDE};border-radius:10px">'
+        f'<tr><td style="padding:6px 16px 10px">'
+        f'<table width="100%" cellpadding="0" cellspacing="0" role="presentation">'
+        f"{encabezado_madrid}{''.join(filas)}</table></td></tr></table>"
+    )
+
+
+def tendencia_barras(serie, currency="MXN"):
+    """Precio mínimo por día, en barras. Sin gráficas externas: los clientes de
+    correo bloquean imágenes remotas y el SVG no se ve en Outlook."""
+    if len(serie) < 2:
+        return ""
+    precios = [p for _, p in serie]
+    minimo, maximo = min(precios), max(precios)
+    rango = maximo - minimo or 1
+    filas = []
+    for dia, precio in serie:
+        # La barra mide la posición dentro del rango, no el valor absoluto, para
+        # que las diferencias se noten aunque sean pequeñas.
+        pct = 15 + (precio - minimo) / rango * 85
+        color = VERDE if precio == minimo else (ROJO if precio == maximo else AZUL)
+        filas.append(
+            f'<tr><td style="padding:3px 8px 3px 0;font-size:11px;color:{GRIS};'
+            f'white-space:nowrap">{_esc(dia[5:])}</td>'
+            f'<td style="padding:3px 8px;width:60%">{_barra(pct, color)}</td>'
+            f'<td style="padding:3px 0;text-align:right;font-size:11px;'
+            f'color:{TINTA};white-space:nowrap">{money(precio, currency)}</td></tr>'
+        )
+    return (
+        f'<table width="100%" cellpadding="0" cellspacing="0" role="presentation" '
+        f'style="background:#ffffff;border:1px solid {BORDE};border-radius:10px">'
+        f'<tr><td style="padding:12px 16px">'
+        f'<table width="100%" cellpadding="0" cellspacing="0" role="presentation">'
+        f"{''.join(filas)}</table>"
+        f'<div style="margin-top:8px;font-size:11px;color:{GRIS}">'
+        f'Verde = el más bajo del periodo · Rojo = el más alto</div>'
+        f"</td></tr></table>"
+    )
+
+
 def _seccion(titulo, subtitulo, cuerpo):
     return (
         f'<tr><td style="padding:18px 0 8px">'
@@ -203,8 +359,21 @@ def _vacio(texto):
     )
 
 
-def construir(reason, offers, search, threshold, encabezado, bloques_texto):
-    """Devuelve el HTML del correo. bloques_texto: [(título, texto)] al final."""
+def construir(
+    reason,
+    offers,
+    search,
+    threshold,
+    encabezado,
+    bloques_texto,
+    plan_b=None,
+    serie=None,
+):
+    """Devuelve el HTML del correo.
+
+    bloques_texto: [(título, texto)] que van al final.
+    plan_b: resultados de plan_b.buscar(). serie: [(día, precio mínimo)].
+    """
     destino = search["destination"]
     horas = search.get("max_layover_hours")
     directos, multi, con_escala = clasificar(offers)
@@ -279,6 +448,8 @@ def construir(reason, offers, search, threshold, encabezado, bloques_texto):
         + "</td></tr>",
     ]
 
+    partes.append(_kpis(principal, best, threshold))
+
     # 1. directo con maleta
     cuerpo = (
         "".join(
@@ -315,7 +486,25 @@ def construir(reason, offers, search, threshold, encabezado, bloques_texto):
     )
     partes.append(_seccion("3. Con escala", limite, cuerpo))
 
-    # bloques de texto (tendencia, meses sin intereses)
+    if serie and len(serie) >= 2:
+        partes.append(
+            _seccion(
+                "Cómo se ha movido el precio",
+                "Precio más bajo de cada día, desde que vigilo esta ruta.",
+                tendencia_barras(serie, best["currency"]),
+            )
+        )
+
+    if plan_b:
+        partes.append(
+            _seccion(
+                "Plan B: otros destinos, mismas fechas",
+                "Solo vuelos directos con maleta, 22 dic al 2 ene. Por si Madrid no baja.",
+                plan_b_tabla(plan_b, principal["price"], principal["currency"]),
+            )
+        )
+
+    # bloques de texto (meses sin intereses)
     for titulo_bloque, texto in bloques_texto:
         partes.append(
             f'<tr><td style="padding:18px 0 8px">'

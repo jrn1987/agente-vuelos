@@ -52,6 +52,13 @@ Todas se consultan en cada revisión y se combinan quedándose con el precio má
 bajo de cada vuelo. **Si una falla, la otra sigue trabajando**; solo si ninguna
 responde te llega un aviso de error (máximo uno al día).
 
+## Plan B: otros destinos
+`plan_b.py` cotiza **vuelos directos con maleta** a Los Ángeles, Nueva York,
+Chicago, París y Tokio en las mismas fechas, y el correo los compara contra
+Madrid con barras proporcionales. Se cotizan **solo cuando va a salir un correo**
+(5 consultas por correo, no por revisión), que es la lección que dejó el bloqueo
+de Booking.
+
 ## Diseño del correo
 `correo.py` arma el correo en HTML con tablas y estilos en línea, porque Gmail y
 Outlook ignoran `<style>` y no soportan flexbox ni grid. Va ordenado por la
@@ -66,6 +73,11 @@ de dos boletos llevan un enlace por tramo, porque son dos compras distintas.
 2. **Multi-aerolínea directo** — ida y vuelta directas, compradas por separado.
 3. **Con escala** — ninguna escala pasa de `max_layover_hours`, ni en la ida ni
    en la vuelta; cada escala se muestra con su duración y su aeropuerto.
+
+Arriba van tres tarjetas de resumen (directo con maleta, la más barata, tu
+objetivo), y más abajo una gráfica de barras con el precio mínimo de cada día.
+Las barras se dibujan con tablas HTML, no con imágenes ni SVG: los clientes de
+correo bloquean las imágenes remotas y Outlook no renderiza SVG.
 
 Si una categoría no tiene resultados, lo dice en vez de desaparecer. Si el diseño
 fallara, el correo cae a una versión de texto simple en lugar de no enviarse.
