@@ -133,6 +133,8 @@ def tarjeta(offer, destino, horas_max, etiqueta=None, destacada=False):
     if offer.get("checked_bag"):
         chips.append(_chip("maleta 23 kg incluida", VERDE, "#f3fbf6"))
     chips.append(_chip(offer.get("source", ""), GRIS))
+    if offer.get("cached"):
+        chips.append(_chip("precio de caché: confírmalo", AMBAR, "#fffdf5"))
     if offer.get("separate_tickets"):
         chips.append(_chip("BOLETOS SEPARADOS", ROJO, "#fdf3f2"))
 
@@ -208,8 +210,12 @@ def construir(reason, offers, search, threshold, encabezado, bloques_texto):
     directos, multi, con_escala = clasificar(offers)
     best = min(offers, key=lambda o: o["price"])
     # El protagonista del correo es el directo con maleta; el resto va después.
-    principal = next((o for o in directos if o.get("checked_bag")), None) or (
-        directos[0] if directos else best
+    # Un precio de caché no encabeza el correo si hay uno en vivo: sería anunciar
+    # como firme algo que todavía hay que confirmar.
+    principal = (
+        next((o for o in directos if o.get("checked_bag") and not o.get("cached")), None)
+        or next((o for o in directos if not o.get("cached")), None)
+        or (directos[0] if directos else best)
     )
 
     titulares = {

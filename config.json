@@ -31,7 +31,8 @@
       "kiwi",
       "googleflights_split",
       "googleflights_split:directos",
-      "kiwi_intl"
+      "kiwi_intl",
+      "travelpayouts"
     ],
     "googleflights": {
       "airlines": [
@@ -71,6 +72,12 @@
       "timeout_seconds": 180,
       "min_interval_minutes": 720,
       "cooldown_after_fail_minutes": 240
+    },
+    "travelpayouts": {
+      "token": "${TRAVELPAYOUTS_TOKEN}",
+      "limit": 30,
+      "min_interval_minutes": 30,
+      "cooldown_after_fail_minutes": 120
     }
   },
   "email": {

@@ -14,6 +14,7 @@
 | **Google Flights** | tarifas de las aerolíneas. Búsqueda general **más una por aerolínea** (Iberia, Aeroméxico, Air Europa, World2Fly): la general sola escondía a Iberia, ~$4,300 MXN más barata. |
 | **Kiwi.com** | tarifas de agencias que Google no siempre muestra. |
 | **Booking.com** | además de sus tarifas, es la única que expone el **costo de agregar la maleta**, lo que permite comparar "tarifa básica + maleta" contra "tarifa con maleta incluida". |
+| **Aviasales (Travelpayouts)** | agrega decenas de agencias con buena cobertura en Latinoamérica. Devuelve precios de **caché**, no en vivo, así que sirve para detectar que una tarifa existe y confirmarla en el enlace; va marcada como tal y nunca encabeza el correo si hay un precio en vivo. Solo aporta **directos**, porque su respuesta no dice cuánto dura cada escala y el límite de 6 h no se podría verificar. |
 | **Booking multi-mercado** | el mismo vuelo comprado desde España, EE.UU. o Reino Unido, convertido a pesos al tipo de cambio del BCE. Solo se reporta si el ahorro pasa del 3%. |
 | **2 sencillos** | compra la ida y la vuelta por separado, incluso en aerolíneas distintas. Gana cuando una de las dos fechas está cara. |
 | **Kiwi multi-mercado** | el mismo vuelo comprado desde España, EE.UU. o Reino Unido, convertido a pesos al tipo de cambio del BCE. |

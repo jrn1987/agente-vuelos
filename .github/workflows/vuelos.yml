@@ -42,6 +42,7 @@ jobs:
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
           GMAIL_USER: ${{ secrets.GMAIL_USER }}
           ALERT_TO: ${{ secrets.ALERT_TO }}
+          TRAVELPAYOUTS_TOKEN: ${{ secrets.TRAVELPAYOUTS_TOKEN }}
         run: |
           if [ "${{ inputs.forzar_correo }}" = "true" ]; then
             python agent.py --force-email

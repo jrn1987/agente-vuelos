@@ -6,6 +6,7 @@ from . import (
     kiwi,
     kiwi_intl,
     serpapi,
+    travelpayouts,
 )
 
 PROVIDERS = {
@@ -16,6 +17,7 @@ PROVIDERS = {
     "kiwi": kiwi.search,
     "kiwi_intl": kiwi_intl.search,
     "serpapi": serpapi.search,
+    "travelpayouts": travelpayouts.search,
 }
 
 
