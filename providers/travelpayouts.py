@@ -81,18 +81,27 @@ def search(search_cfg, provider_cfg=None):
         if not tarifa:
             continue
 
-        nota = (
+        cache = (
             "Precio de CACHÉ de Aviasales: confirma el monto al abrir el enlace, "
             "puede haber cambiado."
         )
         precio = tarifa
+        nota = cache
+        con_maleta = quiere_maleta
         if quiere_maleta:
             estimado, explicacion = equipaje.estimar(d.get("airline", ""))
             if estimado is None:
-                # Sin forma de estimar la maleta, el total no es comparable.
-                continue
-            precio = tarifa + estimado
-            nota = f"Tarifa {tarifa:,.0f} de caché. {explicacion} {nota}"
+                # Antes se descartaba la oferta, y una aerolínea sin tarifa en la
+                # tabla hacía desaparecer la fuente entera sin explicar por qué.
+                con_maleta = False
+                nota = (
+                    f"Tarifa {tarifa:,.0f} SIN maleta documentada y sin tarifa de "
+                    f"equipaje registrada para {d.get('airline', '?')}: súmale ese "
+                    f"costo al reservar. {cache}"
+                )
+            else:
+                precio = tarifa + estimado
+                nota = f"Tarifa {tarifa:,.0f} de caché. {explicacion} {cache}"
 
         enlace = d.get("link") or ""
         if enlace.startswith("/"):
@@ -126,7 +135,7 @@ def search(search_cfg, provider_cfg=None):
                     },
                 ],
                 "seats_left": None,
-                "checked_bag": quiere_maleta,
+                "checked_bag": con_maleta,
                 "stops": 0,
                 "layovers": [],
                 "separate_tickets": False,

@@ -10,7 +10,7 @@ guarda un rango real y se usa el extremo bajo, marcándolo como estimación.
 """
 import fx
 
-VERIFICADO = "12 de septiembre de 2026"
+VERIFICADO = "2 de octubre de 2026"
 
 # Vuelos intercontinentales México–Europa. Precios POR TRAYECTO, en euros.
 TARIFAS = {
@@ -27,6 +27,14 @@ TARIFAS = {
                 "maleta documentada: solo 2 piezas de mano de 10 kg en total.",
         "fuente": "https://www.aeromexico.com/es-mx/informacion-de-viaje/equipaje",
     },
+    "avianca": {
+        "desde_eur": 55,
+        "hasta_eur": 90,
+        "nota": "La tarifa Basic de Avianca NO incluye maleta documentada. Comprarla "
+                "al reservar cuesta mucho menos que en el aeropuerto (ahí llega a "
+                "USD 100). Máximo 23 kg en económica.",
+        "fuente": "https://www.avianca.com/es/informacion-y-ayuda/equipaje/",
+    },
     "air europa": {
         "desde_eur": 40,
         "hasta_eur": 150,
@@ -36,8 +44,23 @@ TARIFAS = {
 }
 
 
+# Varias fuentes devuelven el código IATA ("IB", "AV") en vez del nombre, así que
+# hay que reconocer las dos formas o la estimación se cae sin explicación.
+CODIGOS = {
+    "ib": "iberia",
+    "am": "aeromexico",
+    "ux": "air europa",
+    "av": "avianca",
+    "2w": "world2fly",
+}
+
+
 def _clave(airline):
-    a = (airline or "").lower()
+    a = (airline or "").strip().lower()
+    if not a:
+        return None
+    if a in CODIGOS and CODIGOS[a] in TARIFAS:
+        return CODIGOS[a]
     for k in TARIFAS:
         if k.split()[0] in a:
             return k
