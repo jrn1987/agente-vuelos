@@ -72,13 +72,27 @@ def search(search_cfg, provider_cfg=None):
     if not payload.get("success", True):
         raise RuntimeError(f"Travelpayouts: {str(payload.get('error'))[:150]}")
 
+    crudas = payload.get("data") or []
+    if provider_cfg.get("diagnostico"):
+        # Para entender por qué una respuesta válida llega vacía.
+        print(f"    [tp] respuesta: {len(crudas)} registros · claves={list(payload)}")
+        for d in crudas[:3]:
+            print(
+                f"    [tp] {d.get('airline')} {d.get('price')} "
+                f"escalas={d.get('transfers')}/{d.get('return_transfers')} "
+                f"sale={d.get('departure_at')} vuelve={d.get('return_at')}"
+            )
+
     quiere_maleta = search_cfg.get("checked_bag", True)
     offers = []
-    for d in payload.get("data", []):
+    descartadas = {"con_escala": 0, "sin_precio": 0}
+    for d in crudas:
         if d.get("transfers") or d.get("return_transfers"):
+            descartadas["con_escala"] += 1
             continue  # solo directos: no se puede verificar la escala
         tarifa = float(d.get("price") or 0)
         if not tarifa:
+            descartadas["sin_precio"] += 1
             continue
 
         cache = (
@@ -147,5 +161,10 @@ def search(search_cfg, provider_cfg=None):
             }
         )
 
+    if provider_cfg.get("diagnostico") and not offers:
+        print(
+            f"    [tp] sin ofertas utilizables · descartadas por escala: "
+            f"{descartadas['con_escala']}, sin precio: {descartadas['sin_precio']}"
+        )
     offers.sort(key=lambda o: o["price"])
     return offers
