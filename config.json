@@ -78,7 +78,8 @@
       "limit": 30,
       "min_interval_minutes": 0,
       "cooldown_after_fail_minutes": 120,
-      "diagnostico": true
+      "diagnostico": true,
+      "sondeo": true
     }
   },
   "email": {

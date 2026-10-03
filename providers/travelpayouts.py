@@ -36,6 +36,57 @@ def _duracion(minutos):
     return f"PT{int(minutos) // 60}H{int(minutos) % 60}M"
 
 
+SONDEOS = [
+    ("redondo directo", {"direct": "true", "one_way": "false", "con_regreso": True}),
+    ("redondo con escalas", {"direct": "false", "one_way": "false", "con_regreso": True}),
+    ("solo ida directo", {"direct": "true", "one_way": "true", "con_regreso": False}),
+    ("solo ida con escalas", {"direct": "false", "one_way": "true", "con_regreso": False}),
+    ("mes completo ida", {"direct": "false", "one_way": "true", "con_regreso": False,
+                          "mes": True}),
+]
+
+
+def sondear(search_cfg, token):
+    """Prueba combinaciones para saber qué tiene la caché de Aviasales.
+
+    La API respondió data vacía para el viaje redondo directo, y sin esto solo
+    quedaba adivinar qué parámetro es el que la deja sin datos.
+    """
+    for etiqueta, ajustes in SONDEOS:
+        p = {
+            "origin": search_cfg["origin"],
+            "destination": search_cfg["destination"],
+            "departure_at": search_cfg["departure_date"][:7]
+            if ajustes.get("mes")
+            else search_cfg["departure_date"],
+            "currency": search_cfg.get("currency", "MXN").lower(),
+            "sorting": "price",
+            "direct": ajustes["direct"],
+            "one_way": ajustes["one_way"],
+            "limit": 30,
+            "token": token,
+        }
+        if ajustes["con_regreso"]:
+            p["return_at"] = search_cfg["return_date"]
+        try:
+            req = urllib.request.Request(
+                ENDPOINT + "?" + urllib.parse.urlencode(p),
+                headers={"accept": "application/json"},
+            )
+            d = json.load(urllib.request.urlopen(req, timeout=40, context=_CTX))
+            filas = d.get("data") or []
+            muestra = ""
+            if filas:
+                f0 = filas[0]
+                muestra = (
+                    f" · ej: {f0.get('airline')} {f0.get('price')} "
+                    f"escalas={f0.get('transfers')} sale={str(f0.get('departure_at'))[:10]}"
+                )
+            print(f"    [sondeo] {etiqueta:<22} {len(filas):>3} registros{muestra}")
+        except Exception as exc:
+            print(f"    [sondeo] {etiqueta:<22} ERROR {type(exc).__name__}: {str(exc)[:60]}")
+
+
 def search(search_cfg, provider_cfg=None):
     provider_cfg = provider_cfg or {}
     token = provider_cfg.get("token")
@@ -57,6 +108,9 @@ def search(search_cfg, provider_cfg=None):
         "one_way": "false",
         "token": token,
     }
+    if provider_cfg.get("sondeo"):
+        sondear(search_cfg, token)
+
     url = ENDPOINT + "?" + urllib.parse.urlencode(params)
     req = urllib.request.Request(url, headers={"accept": "application/json"})
     try:
