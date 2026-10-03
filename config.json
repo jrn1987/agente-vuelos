@@ -32,7 +32,8 @@
       "googleflights_split",
       "googleflights_split:directos",
       "kiwi_intl",
-      "travelpayouts"
+      "travelpayouts",
+      "serpapi"
     ],
     "googleflights": {
       "airlines": [
@@ -80,6 +81,11 @@
       "cooldown_after_fail_minutes": 120,
       "diagnostico": true,
       "sondeo": true
+    },
+    "serpapi": {
+      "api_key": "${SERAPI_KEY}",
+      "min_interval_minutes": 480,
+      "cooldown_after_fail_minutes": 720
     }
   },
   "email": {

@@ -361,12 +361,30 @@ def main():
     )
     ap.add_argument("--test-mail", action="store_true")
     ap.add_argument(
+        "--diagnose",
+        action="store_true",
+        help="Consulta las fuentes, imprime qué devolvió cada una y termina. "
+             "No manda correo ni toca el estado.",
+    )
+    ap.add_argument(
         "--force-email",
         action="store_true",
         help="Busca y manda el reporte completo aunque no haya novedades. Para probar.",
     )
     args = ap.parse_args()
     cfg = load_config()
+
+    if args.diagnose:
+        log("Diagnóstico: una pasada por las fuentes, sin correo")
+        offers, failures = gather(cfg)
+        for o in offers[:8]:
+            etiqueta = "directo" if not o.get("stops") else f"{o['stops']} escala(s)"
+            escalas_txt = ", ".join(f"{a} {m}min" for a, m in (o.get("layovers") or []))
+            log(f"  {o['price']:>10,.0f} {o['currency']} · {o['airline'][:22]:<22} "
+                f"{o['source'][:24]:<24} {etiqueta} {escalas_txt}")
+        if failures:
+            log("Fuentes con problema: " + "; ".join(failures))
+        return
 
     if args.force_email:
         log("Envío forzado (prueba)")

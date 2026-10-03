@@ -12,6 +12,10 @@ on:
         description: "Mandar el reporte por correo aunque no haya novedades"
         type: boolean
         default: false
+      solo_diagnostico:
+        description: "Solo revisar las fuentes e imprimir el resultado, sin correo"
+        type: boolean
+        default: false
 
 concurrency:
   # Los turnos de vigilancia no deben pisarse entre sí, pero un envío de prueba
@@ -43,8 +47,11 @@ jobs:
           GMAIL_USER: ${{ secrets.GMAIL_USER }}
           ALERT_TO: ${{ secrets.ALERT_TO }}
           TRAVELPAYOUTS_TOKEN: ${{ secrets.TRAVELPAYOUTS_TOKEN }}
+          SERAPI_KEY: ${{ secrets.SERAPI_KEY }}
         run: |
-          if [ "${{ inputs.forzar_correo }}" = "true" ]; then
+          if [ "${{ inputs.solo_diagnostico }}" = "true" ]; then
+            python agent.py --diagnose
+          elif [ "${{ inputs.forzar_correo }}" = "true" ]; then
             python agent.py --force-email
           else
             python agent.py --loop-minutes 50
