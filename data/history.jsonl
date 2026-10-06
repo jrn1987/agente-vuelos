@@ -609,3 +609,8 @@
 {"ts": "2026-10-05T16:55:21-06:00", "price": 28292.0, "currency": "MXN", "airline": "Avianca", "source": "Google Flights", "count": 34, "stops": 1, "direct_price": 39630.0}
 {"ts": "2026-10-05T17:05:50-06:00", "price": 28292.0, "currency": "MXN", "airline": "Avianca", "source": "Google Flights", "count": 34, "stops": 1, "direct_price": 39630.0}
 {"ts": "2026-10-05T17:16:19-06:00", "price": 28292.0, "currency": "MXN", "airline": "Avianca", "source": "Google Flights", "count": 34, "stops": 1, "direct_price": 39630.0}
+{"ts": "2026-10-05T20:54:57-06:00", "price": 28295.0, "currency": "MXN", "airline": "Avianca", "source": "Google Flights", "count": 48, "stops": 1, "direct_price": 39630.0}
+{"ts": "2026-10-05T21:05:30-06:00", "price": 28295.0, "currency": "MXN", "airline": "Avianca", "source": "Google Flights", "count": 34, "stops": 1, "direct_price": 39630.0}
+{"ts": "2026-10-05T21:16:01-06:00", "price": 28295.0, "currency": "MXN", "airline": "Avianca", "source": "Google Flights", "count": 34, "stops": 1, "direct_price": 39630.0}
+{"ts": "2026-10-05T21:26:30-06:00", "price": 30178.0, "currency": "MXN", "airline": "Avianca", "source": "Google Flights", "count": 34, "stops": 1, "direct_price": 39630.0}
+{"ts": "2026-10-05T21:37:03-06:00", "price": 30178.0, "currency": "MXN", "airline": "Avianca", "source": "Google Flights", "count": 34, "stops": 1, "direct_price": 39630.0}
