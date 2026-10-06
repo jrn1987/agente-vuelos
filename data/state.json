@@ -1,28 +1,30 @@
 {
   "emails_date": "2026-10-06",
-  "emails_sent": 2,
-  "digest_sent": false,
-  "last_best_price": 30130.0,
+  "emails_sent": 5,
+  "digest_sent": true,
+  "last_best_price": 30019.0,
   "all_time_low": 22409.39,
-  "last_check": "2026-10-06T04:49:40-06:00",
-  "last_email_ts": "2026-10-06T04:28:41-06:00",
+  "last_check": "2026-10-06T11:29:18-06:00",
+  "last_email_ts": "2026-10-06T11:29:18-06:00",
   "prices_notified": [
+    29990.0,
+    30019.0,
     30119.0,
     30130.0
   ],
   "jackpot_price": 23804.866,
-  "last_direct_price": 43510.0,
+  "last_direct_price": 44952.0,
   "all_time_low_direct": 37938.0,
   "provider_last_ok": {
-    "googleflights": "2026-10-06T04:49:12-06:00",
-    "googleflights:directos": "2026-10-06T04:49:13-06:00",
-    "kiwi": "2026-10-06T04:49:32-06:00",
-    "googleflights_split": "2026-10-06T04:49:33-06:00",
-    "googleflights_split:directos": "2026-10-06T04:49:34-06:00",
-    "serpapi": "2026-10-05T20:54:57-06:00"
+    "googleflights": "2026-10-06T11:28:49-06:00",
+    "googleflights:directos": "2026-10-06T11:28:51-06:00",
+    "kiwi": "2026-10-06T11:29:08-06:00",
+    "googleflights_split": "2026-10-06T11:29:09-06:00",
+    "googleflights_split:directos": "2026-10-06T11:29:10-06:00",
+    "serpapi": "2026-10-06T10:47:12-06:00"
   },
   "provider_last_fail": {
-    "booking": "2026-10-06T04:07:11-06:00",
+    "booking": "2026-10-06T10:46:45-06:00",
     "googleflights_split": "2026-10-04T12:06:39-06:00",
     "googleflights_split:directos": "2026-10-05T10:06:02-06:00"
   }
