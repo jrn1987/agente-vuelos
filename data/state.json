@@ -15,11 +15,11 @@
   "last_direct_price": 38813.0,
   "all_time_low_direct": 37938.0,
   "provider_last_ok": {
-    "googleflights": "2026-10-09T09:06:34-06:00",
-    "googleflights:directos": "2026-10-09T09:06:36-06:00",
-    "kiwi": "2026-10-09T09:06:20-06:00",
-    "googleflights_split": "2026-10-09T09:04:30-06:00",
-    "googleflights_split:directos": "2026-10-09T09:06:22-06:00",
+    "googleflights": "2026-10-09T10:50:31-06:00",
+    "googleflights:directos": "2026-10-09T10:50:33-06:00",
+    "kiwi": "2026-10-09T10:50:19-06:00",
+    "googleflights_split": "2026-10-09T10:50:20-06:00",
+    "googleflights_split:directos": "2026-10-09T10:50:21-06:00",
     "serpapi": "2026-10-09T09:04:37-06:00"
   },
   "provider_last_fail": {
@@ -30,35 +30,37 @@
   },
   "routes": {
     "mad": {
-      "last_best_price": 30562.0,
+      "last_best_price": 30748.0,
       "all_time_low": 22409.39,
       "last_direct_price": 38813.0,
       "all_time_low_direct": 37938.0,
-      "last_check": "2026-10-09T09:06:32-06:00",
-      "last_email_ts": "2026-10-09T09:06:32-06:00",
+      "last_check": "2026-10-09T10:50:30-06:00",
+      "last_email_ts": "2026-10-09T10:29:20-06:00",
       "emails_date": "2026-10-09",
-      "emails_sent": 3,
-      "digest_sent": false,
+      "emails_sent": 6,
+      "digest_sent": true,
       "prices_notified": [
         30335.0,
         30351.0,
-        30562.0
+        30562.0,
+        30684.0,
+        30748.0
       ]
     },
     "sfo": {
       "emails_date": "2026-10-09",
-      "emails_sent": 1,
-      "digest_sent": false,
+      "emails_sent": 2,
+      "digest_sent": true,
       "prices_notified": [
         10790.0
       ],
-      "last_email_ts": "2026-10-09T09:06:38-06:00",
+      "last_email_ts": "2026-10-09T10:08:09-06:00",
       "jackpot_price": 10790.0,
       "last_best_price": 10790.0,
       "last_direct_price": 10790.0,
       "all_time_low_direct": 10790.0,
       "all_time_low": 10790.0,
-      "last_check": "2026-10-09T09:06:38-06:00"
+      "last_check": "2026-10-09T10:50:33-06:00"
     }
   }
 }
