@@ -69,7 +69,7 @@ jobs:
             git fetch -q origin main
             git reset -q --hard origin/main
             python scripts/merge_estado.py data /tmp/mio
-            git add -f data/state.json data/history.jsonl
+            git add -f data/state.json data/history*.jsonl
             if git diff --staged --quiet; then
               echo "Sin cambios que guardar"; exit 0
             fi

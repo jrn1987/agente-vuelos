@@ -81,6 +81,38 @@ def load_config():
     return cfg
 
 
+def rutas(cfg):
+    """Rutas vigiladas. Si la config es la antigua (una sola), se envuelve."""
+    if cfg.get("routes"):
+        return cfg["routes"]
+    return [
+        {
+            "id": "principal",
+            "name": cfg["search"]["destination"],
+            "history": "history.jsonl",
+            "plan_b": True,
+            "search": cfg["search"],
+            "alerts": cfg["alerts"],
+        }
+    ]
+
+
+def estado_ruta(state, rid):
+    """Estado de una ruta. Migra el estado viejo de una sola ruta a la primera."""
+    rutas_estado = state.setdefault("routes", {})
+    if rid not in rutas_estado:
+        heredables = (
+            "last_best_price", "all_time_low", "last_direct_price",
+            "all_time_low_direct", "last_check", "last_email_ts", "emails_date",
+            "emails_sent", "digest_sent", "prices_notified", "jackpot_price",
+        )
+        if rid == "mad" and "last_best_price" in state:
+            rutas_estado[rid] = {k: state[k] for k in heredables if k in state}
+        else:
+            rutas_estado[rid] = {}
+    return rutas_estado[rid]
+
+
 def load_state():
     if os.path.exists(STATE):
         with open(STATE) as f:
@@ -201,14 +233,14 @@ def en_pausa(name, cfg, state):
     return False
 
 
-def gather(cfg):
-    """Consulta todas las fuentes configuradas y junta los resultados.
+def gather(cfg, search_cfg=None, names=None):
+    """Consulta las fuentes y junta los resultados.
 
     Si una fuente falla, se sigue con las demás: el agente solo se da por vencido
     cuando ninguna responde.
     """
-    search_cfg = cfg["search"]
-    names = cfg["provider"].get("names") or [cfg["provider"]["name"]]
+    search_cfg = search_cfg or rutas(cfg)[0]["search"]
+    names = names or cfg["provider"].get("names") or [cfg["provider"]["name"]]
     # Tope de tiempo por fuente: una que se cuelgue no debe retrasar la revisión
     # completa (Kiwi, por ejemplo, tarda minutos cuando nos limita el ritmo).
     tope_global = cfg["provider"].get("timeout_seconds", 120)
@@ -271,11 +303,26 @@ def gather(cfg):
 
 
 def run_once(cfg, forzar=False):
-    search_cfg = cfg["search"]
-    offers, failures = gather(cfg)
+    """Revisa todas las rutas vigiladas, cada una con su estado e historial."""
+    for ruta in rutas(cfg):
+        try:
+            revisar_ruta(cfg, ruta, forzar)
+        except Exception:
+            log(f"[{ruta['id']}] ERROR:\n" + traceback.format_exc())
+
+
+def revisar_ruta(cfg, ruta, forzar=False):
+    rid = ruta["id"]
+    search_cfg = ruta["search"]
+    alerts = ruta["alerts"]
+    history = os.path.join(DATA, ruta.get("history", f"history-{rid}.jsonl"))
+    etiqueta = f"[{ruta.get('name', rid)}]"
+
+    log(f"{etiqueta} {search_cfg['origin']} → {search_cfg['destination']}")
+    offers, failures = gather(cfg, search_cfg, ruta.get("providers"))
 
     if not offers:
-        log("Ninguna fuente devolvió vuelos directos.")
+        log(f"{etiqueta} ninguna fuente devolvió vuelos.")
         state = load_state()
         today = now().date().isoformat()
         if failures and state.get("failure_alert_date") != today:
@@ -294,12 +341,13 @@ def run_once(cfg, forzar=False):
     best = offers[0]
     directos = [o for o in offers if not o.get("stops")]
     mejor_directo = directos[0] if directos else None
-    state = load_state()
-    log(f"TOTAL {len(offers)} opciones · mejor "
+    estado_global = load_state()
+    state = estado_ruta(estado_global, rid)
+    log(f"{etiqueta} TOTAL {len(offers)} opciones · mejor "
         f"{render.money(best['price'], best['currency'])} ({best['airline']}, vía {best['source']})")
 
-    os.makedirs(os.path.dirname(HISTORY), exist_ok=True)
-    with open(HISTORY, "a") as f:
+    os.makedirs(os.path.dirname(history), exist_ok=True)
+    with open(history, "a") as f:
         f.write(json.dumps({
             "ts": now().isoformat(timespec="seconds"),
             "price": best["price"],
@@ -314,13 +362,18 @@ def run_once(cfg, forzar=False):
     reason = decide(
         best["price"],
         state,
-        cfg["alerts"],
+        alerts,
         mejor_directo["price"] if mejor_directo else None,
     )
     if forzar:
         reason = reason or "prueba"
     alternativos = None
-    if reason and (cfg.get("plan_b") or {}).get("enabled"):
+    plan_b_cfg = cfg.get("plan_b") or {}
+    if (
+        reason
+        and plan_b_cfg.get("enabled")
+        and rid in plan_b_cfg.get("solo_en", [rid])
+    ):
         # 5 consultas extra por correo, no por revisión: si no hay nada que
         # contar, no se cotizan destinos alternativos.
         try:
@@ -336,8 +389,8 @@ def run_once(cfg, forzar=False):
             offers,
             state,
             search_cfg,
-            cfg["alerts"].get("price_threshold"),
-            HISTORY,
+            alerts.get("price_threshold"),
+            history,
             alternativos,
         )
         notifier.send(cfg["email"], render.subject(reason, best, search_cfg), text, html)
@@ -348,11 +401,12 @@ def run_once(cfg, forzar=False):
             state["digest_sent"] = True
         if reason == "jackpot":
             state["jackpot_price"] = best["price"]
-        log(f"Correo enviado ({reason}) a {', '.join(cfg['email']['to_addrs'])}")
+        log(f"{etiqueta} correo enviado ({reason}) a "
+            f"{', '.join(cfg['email']['to_addrs'])}")
     else:
-        log("Sin cambios relevantes; no se envía correo.")
+        log(f"{etiqueta} sin cambios relevantes; no se envía correo.")
 
-    if best["price"] >= cfg["alerts"].get("price_threshold", 0):
+    if best["price"] >= alerts.get("price_threshold", 0):
         state.pop("jackpot_price", None)
     state["last_best_price"] = best["price"]
     if mejor_directo:
@@ -362,7 +416,18 @@ def run_once(cfg, forzar=False):
         )
     state["all_time_low"] = min(best["price"], state.get("all_time_low", best["price"]))
     state["last_check"] = now().isoformat(timespec="seconds")
-    save_state(state)
+    save_state(estado_global)
+
+
+def diagnosticar(cfg, ruta):
+    offers, failures = gather(cfg, ruta["search"], ruta.get("providers"))
+    for o in offers[:8]:
+        etiqueta = "directo" if not o.get("stops") else f"{o['stops']} escala(s)"
+        escalas_txt = ", ".join(f"{a} {m}min" for a, m in (o.get("layovers") or []))
+        log(f"  {o['price']:>10,.0f} {o['currency']} · {o['airline'][:22]:<22} "
+            f"{o['source'][:24]:<24} {etiqueta} {escalas_txt}")
+    if failures:
+        log("  fuentes con problema: " + "; ".join(failures))
 
 
 def main():
@@ -394,17 +459,14 @@ def main():
 
     if args.diagnose:
         log("Diagnóstico: una pasada por las fuentes, sin correo")
-        offers, failures = gather(cfg)
-        for o in offers[:8]:
-            etiqueta = "directo" if not o.get("stops") else f"{o['stops']} escala(s)"
-            escalas_txt = ", ".join(f"{a} {m}min" for a, m in (o.get("layovers") or []))
-            log(f"  {o['price']:>10,.0f} {o['currency']} · {o['airline'][:22]:<22} "
-                f"{o['source'][:24]:<24} {etiqueta} {escalas_txt}")
-        if failures:
-            log("Fuentes con problema: " + "; ".join(failures))
+        for ruta in rutas(cfg):
+            log(f"--- {ruta.get('name', ruta['id'])} "
+                f"({ruta['search']['origin']} → {ruta['search']['destination']}) ---")
+            diagnosticar(cfg, ruta)
         return
 
     if args.force_email:
+
         log("Envío forzado (prueba)")
         run_once(cfg, forzar=True)
         return

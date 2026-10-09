@@ -1,4 +1,4 @@
-# Agente de vuelos directos CDMX → Madrid
+# Agente de vuelos CDMX → Madrid y San Francisco
 
 
 
@@ -51,6 +51,21 @@ para que la compares contra la mejor de un solo boleto antes de decidir.
 Todas se consultan en cada revisión y se combinan quedándose con el precio más
 bajo de cada vuelo. **Si una falla, la otra sigue trabajando**; solo si ninguna
 responde te llega un aviso de error (máximo uno al día).
+
+## Rutas vigiladas
+El agente sigue varias rutas a la vez (`routes` en `config.json`), cada una con
+su propio objetivo de precio, su historial y sus avisos:
+
+| Ruta | Criterio | Objetivo | Fuentes |
+|---|---|---|---|
+| **Madrid** | directos y 1 escala ≤6 h, con maleta | $25,000 | las 10 |
+| **San Francisco** | **solo directos**, con maleta | $11,000 | Google, Booking, SerpAPI |
+
+San Francisco usa menos fuentes a propósito: las multi-mercado y de caché no
+aportan en esa ruta y solo gastarían ritmo contra los mismos servidores.
+
+Cada ruta manda su propio correo cuando tiene novedades, así que un movimiento
+en Madrid no se confunde con uno en San Francisco.
 
 ## Plan B: otros destinos
 `plan_b.py` cotiza **vuelos directos con maleta** a Los Ángeles, Nueva York,
