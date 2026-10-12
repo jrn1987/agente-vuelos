@@ -740,3 +740,8 @@
 {"ts": "2026-10-11T19:36:06-06:00", "price": 32630.0, "currency": "MXN", "airline": "Avianca", "source": "Google Flights", "count": 36, "stops": 1, "direct_price": 39094.0}
 {"ts": "2026-10-11T19:46:42-06:00", "price": 32630.0, "currency": "MXN", "airline": "Avianca", "source": "Google Flights", "count": 36, "stops": 1, "direct_price": 39094.0}
 {"ts": "2026-10-11T19:57:15-06:00", "price": 32630.0, "currency": "MXN", "airline": "Avianca", "source": "Google Flights", "count": 36, "stops": 1, "direct_price": 39094.0}
+{"ts": "2026-10-12T03:05:19-06:00", "price": 34924.45, "currency": "MXN", "airline": "Avianca", "source": "SerpAPI (verificaci\u00f3n)", "count": 30, "stops": 1, "direct_price": 41993.7}
+{"ts": "2026-10-12T03:15:46-06:00", "price": 44234.69893, "currency": "MXN", "airline": "Iberia Airlines", "source": "Kiwi.com", "count": 20, "stops": 0, "direct_price": 44234.69893}
+{"ts": "2026-10-12T03:26:09-06:00", "price": 51068.69893, "currency": "MXN", "airline": "Iberia Airlines", "source": "Kiwi.com", "count": 20, "stops": 0, "direct_price": 51068.69893}
+{"ts": "2026-10-12T03:36:36-06:00", "price": 51068.69893, "currency": "MXN", "airline": "Iberia Airlines", "source": "Kiwi.com", "count": 20, "stops": 0, "direct_price": 51068.69893}
+{"ts": "2026-10-12T03:46:59-06:00", "price": 51068.69893, "currency": "MXN", "airline": "Iberia Airlines", "source": "Kiwi.com", "count": 20, "stops": 0, "direct_price": 51068.69893}
