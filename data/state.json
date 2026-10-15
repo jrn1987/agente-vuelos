@@ -15,33 +15,34 @@
   "last_direct_price": 38813.0,
   "all_time_low_direct": 37938.0,
   "provider_last_ok": {
-    "googleflights": "2026-10-14T16:57:30-06:00",
-    "googleflights:directos": "2026-10-14T16:57:32-06:00",
-    "kiwi": "2026-10-14T16:57:23-06:00",
-    "googleflights_split": "2026-10-14T16:46:53-06:00",
+    "googleflights": "2026-10-14T20:07:17-06:00",
+    "googleflights:directos": "2026-10-14T20:07:20-06:00",
+    "kiwi": "2026-10-14T20:07:11-06:00",
+    "googleflights_split": "2026-10-14T19:46:06-06:00",
     "googleflights_split:directos": "2026-10-14T16:46:54-06:00",
     "serpapi": "2026-10-14T16:15:20-06:00"
   },
   "provider_last_fail": {
-    "booking": "2026-10-14T16:14:45-06:00",
-    "googleflights_split": "2026-10-14T16:57:23-06:00",
-    "googleflights_split:directos": "2026-10-14T16:57:23-06:00",
+    "booking": "2026-10-14T19:24:40-06:00",
+    "googleflights_split": "2026-10-14T19:56:38-06:00",
+    "googleflights_split:directos": "2026-10-14T19:25:00-06:00",
     "googleflights": "2026-10-14T08:21:34-06:00",
     "googleflights:directos": "2026-10-14T01:31:02-06:00"
   },
   "routes": {
     "mad": {
-      "last_best_price": 45860.0,
+      "last_best_price": 32771.0,
       "all_time_low": 22409.39,
-      "last_direct_price": 45860.0,
+      "last_direct_price": 51434.6582,
       "all_time_low_direct": 37938.0,
-      "last_check": "2026-10-14T16:57:28-06:00",
-      "last_email_ts": "2026-10-14T16:25:57-06:00",
+      "last_check": "2026-10-14T20:07:16-06:00",
+      "last_email_ts": "2026-10-14T19:56:46-06:00",
       "emails_date": "2026-10-14",
-      "emails_sent": 5,
+      "emails_sent": 7,
       "digest_sent": true,
       "prices_notified": [
         32769.0,
+        32771.0,
         32801.0,
         32839.0
       ]
@@ -60,7 +61,7 @@
       "last_direct_price": 11979.0,
       "all_time_low_direct": 9014.0,
       "all_time_low": 9014.0,
-      "last_check": "2026-10-14T16:57:32-06:00"
+      "last_check": "2026-10-14T20:07:20-06:00"
     }
   },
   "failure_alert_date": "2026-10-14"
