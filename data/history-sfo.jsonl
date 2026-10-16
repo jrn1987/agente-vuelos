@@ -136,3 +136,8 @@
 {"ts": "2026-10-16T06:41:49-06:00", "price": 11846.0, "currency": "MXN", "airline": "United", "source": "Google Flights", "count": 5, "stops": 0, "direct_price": 11846.0}
 {"ts": "2026-10-16T06:52:19-06:00", "price": 11846.0, "currency": "MXN", "airline": "United", "source": "Google Flights", "count": 5, "stops": 0, "direct_price": 11846.0}
 {"ts": "2026-10-16T07:02:56-06:00", "price": 11846.0, "currency": "MXN", "airline": "United", "source": "Google Flights", "count": 5, "stops": 0, "direct_price": 11846.0}
+{"ts": "2026-10-16T11:21:48-06:00", "price": 15767.0, "currency": "MXN", "airline": "Aeromexico", "source": "Google Flights", "count": 3, "stops": 0, "direct_price": 15767.0}
+{"ts": "2026-10-16T11:32:26-06:00", "price": 11846.0, "currency": "MXN", "airline": "United", "source": "Google Flights", "count": 5, "stops": 0, "direct_price": 11846.0}
+{"ts": "2026-10-16T11:43:05-06:00", "price": 11846.0, "currency": "MXN", "airline": "United", "source": "Google Flights", "count": 5, "stops": 0, "direct_price": 11846.0}
+{"ts": "2026-10-16T11:53:42-06:00", "price": 11846.0, "currency": "MXN", "airline": "United", "source": "Google Flights", "count": 5, "stops": 0, "direct_price": 11846.0}
+{"ts": "2026-10-16T12:04:10-06:00", "price": 15767.0, "currency": "MXN", "airline": "Aeromexico", "source": "Google Flights", "count": 3, "stops": 0, "direct_price": 15767.0}
