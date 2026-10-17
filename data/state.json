@@ -15,32 +15,33 @@
   "last_direct_price": 38813.0,
   "all_time_low_direct": 37938.0,
   "provider_last_ok": {
-    "googleflights": "2026-10-17T11:46:42-06:00",
-    "googleflights:directos": "2026-10-17T11:46:44-06:00",
-    "kiwi": "2026-10-17T11:46:31-06:00",
-    "googleflights_split": "2026-10-17T11:25:20-06:00",
-    "googleflights_split:directos": "2026-10-17T11:25:21-06:00",
+    "googleflights": "2026-10-17T14:01:12-06:00",
+    "googleflights:directos": "2026-10-17T13:50:14-06:00",
+    "kiwi": "2026-10-17T14:01:04-06:00",
+    "googleflights_split": "2026-10-17T13:18:54-06:00",
+    "googleflights_split:directos": "2026-10-17T13:40:02-06:00",
     "serpapi": "2026-10-17T07:40:16-06:00"
   },
   "provider_last_fail": {
-    "booking": "2026-10-17T11:03:47-06:00",
-    "googleflights_split": "2026-10-17T11:35:56-06:00",
-    "googleflights_split:directos": "2026-10-17T11:35:56-06:00",
+    "booking": "2026-10-17T13:18:36-06:00",
+    "googleflights_split": "2026-10-17T13:29:30-06:00",
+    "googleflights_split:directos": "2026-10-17T13:50:33-06:00",
     "googleflights": "2026-10-17T07:40:21-06:00",
-    "googleflights:directos": "2026-10-17T08:00:56-06:00"
+    "googleflights:directos": "2026-10-17T13:50:44-06:00"
   },
   "routes": {
     "mad": {
-      "last_best_price": 32797.0,
+      "last_best_price": 27247.0,
       "all_time_low": 22409.39,
-      "last_direct_price": 36103.0,
-      "all_time_low_direct": 33143.71,
-      "last_check": "2026-10-17T11:46:40-06:00",
-      "last_email_ts": "2026-10-17T11:36:05-06:00",
+      "last_direct_price": 27875.0,
+      "all_time_low_direct": 27875.0,
+      "last_check": "2026-10-17T14:01:10-06:00",
+      "last_email_ts": "2026-10-17T13:50:41-06:00",
       "emails_date": "2026-10-17",
-      "emails_sent": 7,
+      "emails_sent": 9,
       "digest_sent": true,
       "prices_notified": [
+        27247.0,
         32797.0,
         32817.0,
         36103.0
@@ -62,7 +63,7 @@
       "last_direct_price": 15526.0,
       "all_time_low_direct": 9014.0,
       "all_time_low": 9014.0,
-      "last_check": "2026-10-17T11:46:44-06:00"
+      "last_check": "2026-10-17T14:01:12-06:00"
     }
   },
   "failure_alert_date": "2026-10-15"
