@@ -15,50 +15,52 @@
   "last_direct_price": 38813.0,
   "all_time_low_direct": 37938.0,
   "provider_last_ok": {
-    "googleflights": "2026-10-19T02:23:53-06:00",
-    "googleflights:directos": "2026-10-19T02:23:55-06:00",
-    "kiwi": "2026-10-19T02:23:40-06:00",
-    "googleflights_split": "2026-10-19T02:13:01-06:00",
-    "googleflights_split:directos": "2026-10-19T02:23:42-06:00",
-    "serpapi": "2026-10-19T01:41:29-06:00"
+    "googleflights": "2026-10-19T10:04:02-06:00",
+    "googleflights:directos": "2026-10-19T09:53:04-06:00",
+    "kiwi": "2026-10-19T10:03:53-06:00",
+    "googleflights_split": "2026-10-19T10:03:54-06:00",
+    "googleflights_split:directos": "2026-10-19T10:03:55-06:00",
+    "serpapi": "2026-10-19T09:42:53-06:00"
   },
   "provider_last_fail": {
-    "booking": "2026-10-19T01:40:52-06:00",
+    "booking": "2026-10-19T09:31:45-06:00",
     "googleflights_split": "2026-10-19T02:23:41-06:00",
     "googleflights_split:directos": "2026-10-18T15:06:04-06:00",
     "googleflights": "2026-10-18T14:45:14-06:00",
-    "googleflights:directos": "2026-10-18T08:41:35-06:00",
+    "googleflights:directos": "2026-10-19T09:53:34-06:00",
     "travelpayouts": "2026-10-18T05:19:46-06:00"
   },
   "routes": {
     "mad": {
-      "last_best_price": 32891.0,
+      "last_best_price": 34625.0,
       "all_time_low": 19767.71,
-      "last_direct_price": 40945.63718,
+      "last_direct_price": 41250.0,
       "all_time_low_direct": 19767.71,
-      "last_check": "2026-10-19T02:23:51-06:00",
-      "last_email_ts": "2026-10-19T02:13:13-06:00",
+      "last_check": "2026-10-19T10:04:00-06:00",
+      "last_email_ts": "2026-10-19T09:53:31-06:00",
       "emails_date": "2026-10-19",
-      "emails_sent": 1,
-      "digest_sent": false,
+      "emails_sent": 4,
+      "digest_sent": true,
       "prices_notified": [
-        32616.0
+        32616.0,
+        34619.0,
+        34625.0
       ]
     },
     "sfo": {
       "emails_date": "2026-10-19",
-      "emails_sent": 1,
-      "digest_sent": false,
+      "emails_sent": 2,
+      "digest_sent": true,
       "prices_notified": [
         15526.0
       ],
-      "last_email_ts": "2026-10-19T01:41:34-06:00",
+      "last_email_ts": "2026-10-19T09:32:22-06:00",
       "jackpot_price": 9200.0,
       "last_best_price": 15526.0,
       "last_direct_price": 15526.0,
       "all_time_low_direct": 9014.0,
       "all_time_low": 9014.0,
-      "last_check": "2026-10-19T02:23:55-06:00"
+      "last_check": "2026-10-19T10:04:02-06:00"
     }
   },
   "failure_alert_date": "2026-10-18"
